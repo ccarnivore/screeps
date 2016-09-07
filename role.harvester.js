@@ -29,6 +29,7 @@ var roleHarvester = {
                     creep.moveTo(targets[0]);
                 }
             } else {
+
                 // creep should wait at spawn
                 var spawn = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => { return (structure.structureType == STRUCTURE_SPAWN) }
