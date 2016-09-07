@@ -25,7 +25,6 @@ module.exports.loop = function () {
         }
     }*/
 
-
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
         switch(creep.memory.role) {
@@ -44,9 +43,14 @@ module.exports.loop = function () {
                 break;
             }
             
-            case 'harvester':
-            default: {
+            case 'harvester': {
                 roleHarvester.run(creep);
+                break;
+            }
+
+            default: {
+                creep.say('no role. suicide');
+                creep.suicide();
             }
             
         }
