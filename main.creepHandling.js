@@ -128,6 +128,7 @@ var creepHandler = {
 
                     if (diff - cost >= 0) {
                         buildPattern.push(part);
+                        diff -= cost;
                     } else {
                         break;
                     }
