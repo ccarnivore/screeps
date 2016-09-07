@@ -6,15 +6,13 @@ var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
 
 module.exports.loop = function () {
-
-    console.log('test');
     sourceHandler.globalLookUp(Game.spawns['Spawn1']);
     
     creepHandler.wipeDead();
     creepHandler.checkCreepPopulation(Game.spawns['Spawn1']);
-    
-    var tower = Game.getObjectById('b94effd8265d4ad18cc18e12');
-    /*if(tower) {
+
+    /*var tower = Game.getObjectById('b94effd8265d4ad18cc18e12');
+    if(tower) {
         var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => structure.hits < structure.hitsMax
         });
