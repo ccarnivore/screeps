@@ -12,8 +12,7 @@
 var limitation = {
     harvester: 1,
     upgrader: 1,
-    builder: 2,
-    repair: 1
+    builder: 2
 };
 
 var creepHandler = {
@@ -44,7 +43,7 @@ var creepHandler = {
      */
     checkCreepPopulation: function(spawn) {
         var creepCount = 0;
-        var creation = { harvester: 0, upgrader: 0, builder: 0, repair: 0 };
+        var creation = { harvester: 0, upgrader: 0, builder: 0 };
 
         for (var creepName in Game.creeps) {
             creepCount ++;

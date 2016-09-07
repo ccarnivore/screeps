@@ -13,33 +13,33 @@ var sourceHandler = {
             for (var i = 0; i < Memory.sourceDict.length; i++) {
                 var knownSource = Memory.sourceDict[i];
                 if (knownSource.sourceId == currentSource.id) {
-    	            known = true;
-    	            continue;
-    	        }
+                    known = true;
+                    continue;
+                }
             }
-    	    
-    	    if (!known) {
-    	        Memory.sourceDict.push({sourceId: currentSource.id, creeps: []});
-    	    }
+
+            if (!known) {
+                Memory.sourceDict.push({sourceId: currentSource.id, creeps: []});
+            }
         }
     },
     
     
     findSource: function(creep) {
-	    if (creep.memory.usedSourceId) {
-	        return Game.getObjectById(creep.memory.usedSourceId);
-	    }
-	    
-	    creep.say('searching...');
-	    var mySource = Memory.sourceDict[0];
-	    
-	    console.log(mySource.sourceId);
-	    
-	    creep.memory.usedSourceId = mySource.sourceId;
-	    Memory.sourceDict[0].creeps.push(creep.id);
-	    
-	    return Game.getObjectById(mySource.sourceId);
-	}
+        if (creep.memory.usedSourceId) {
+            return Game.getObjectById(creep.memory.usedSourceId);
+        }
+
+        creep.say('searching...');
+        var mySource = Memory.sourceDict[0];
+
+        console.log(mySource.sourceId);
+
+        creep.memory.usedSourceId = mySource.sourceId;
+        Memory.sourceDict[0].creeps.push(creep.id);
+
+        return Game.getObjectById(mySource.sourceId);
+    }
     
     
 }

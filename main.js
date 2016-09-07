@@ -1,7 +1,6 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
-var roleRepairer = require('role.repair');
 var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
 
@@ -38,18 +37,13 @@ module.exports.loop = function () {
                 break;
             }
             
-            case 'repair': {
-                roleRepairer.run(creep);
-                break;
-            }
-            
             case 'harvester': {
                 roleHarvester.run(creep);
                 break;
             }
 
             default: {
-                creep.say('no role. suicide');
+                creep.say('no known role. suicide');
                 console.log(creep.id + ' suicide - no role');
                 creep.suicide();
             }

@@ -4,8 +4,8 @@ var roleHarvester = {
     /** @param {Creep} creep **/
     run: function(creep) {
         if(creep.carry.energy < creep.carryCapacity) {
-	        var mySource = sourceHandler.findSource(creep);
-	        if(creep.harvest(mySource) == ERR_NOT_IN_RANGE) {
+            var mySource = sourceHandler.findSource(creep);
+            if(creep.harvest(mySource) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(mySource);
             }
         }
@@ -30,8 +30,8 @@ var roleHarvester = {
                 }
             }
         }
-	}
-	
+    }
+    
 };
 
 module.exports = roleHarvester;
