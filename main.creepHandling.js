@@ -53,26 +53,12 @@ var creepHandler = {
         }
 
         var weightedRole = ['harvester', 'upgrader', 'builder', 'repair'];
-        for (var role in weightedRole) {
-            console.log('lookup role ' + role);
-
+        for (var i = 0; i < weightedRole.length; i++) {
+            var role = weightedRole[i];
+            if (exists[role] < limitation[role]) {
+                this.createCreep(spawn, role);
+            }
         }
-
-        /*if (exists['harvester'] < limitation['harvester']) {
-            this.createCreep(spawn, 'harvester');
-        }
-
-        if (exists['upgrader'] < limitation['upgrader']) {
-            this.createCreep(spawn, 'upgrader');
-        }
-
-        if (exists['builder'] < limitation['builder']) {
-            this.createCreep(spawn, 'builder');
-        }
-
-        if (exists['repair'] < limitation['repair']) {
-            this.createCreep(spawn, 'repair');
-        }*/
 
     },
 
