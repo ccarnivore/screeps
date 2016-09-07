@@ -12,3 +12,7 @@
  tower.attack(closestHostile);
  }
  }*/
+
+var ROLE_BUILDER = 'builder';
+var ROLE_HARVESTER = 'harvester';
+var ROLE_UPGRADER = 'upgrader';

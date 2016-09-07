@@ -4,6 +4,7 @@ var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
+var c = require('main.const');
 
 module.exports.loop = function () {
     sourceHandler.globalLookUp(Game.spawns['Spawn1']);
@@ -14,17 +15,17 @@ module.exports.loop = function () {
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
         switch(creep.memory.role) {
-            case 'builder': {
+            case ROLE_BUILDER: {
                 roleBuilder.run(creep);
                 break;
             }
             
-            case 'upgrader': {
+            case ROLE_UPGRADER: {
                 roleUpgrader.run(creep);
                 break;
             }
             
-            case 'harvester': {
+            case ROLE_HARVESTER: {
                 roleHarvester.run(creep);
                 break;
             }

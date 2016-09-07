@@ -37,8 +37,8 @@ var globalBuildPattern = {
 
 var limitation = {
     harvester: 2,
-    upgrader: 4,
-    builder: 4
+    upgrader: 3,
+    builder: 5
 };
 
 var creepHandler = {
