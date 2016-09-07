@@ -133,7 +133,7 @@ var creepHandler = {
     getCreationEnergy: function(spawn) {
         var energy = spawn.energy;
         var extensionCollection = spawn.room.find(FIND_STRUCTURES, {
-            filter: (structure) => { return (structure.structureType == STRUCTURE_EXTENSION)
+            filter: (structure) => { return (structure.structureType == STRUCTURE_EXTENSION) }
         });
 
         for (var extension in extensionCollection) {
