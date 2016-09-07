@@ -10,10 +10,10 @@
 // W25N58
 
 var weight = {
-    WORK: 50,
+    WORK: 100,
     CARRY: 50,
     MOVE: 50,
-}
+};
 
 var limitation = {
     harvester: 2,
