@@ -71,6 +71,7 @@ var creepHandler = {
             if (creation[role] < limitation[role]) {
                 console.log(role + ' matches creation');
                 this.createCreep(spawn, role);
+                return;
             }
         }
 
