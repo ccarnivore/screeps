@@ -10,7 +10,7 @@
 // W25N58
  
 var limitation = {
-    harvester: 1,
+    harvester: 2,
     upgrader: 1,
     builder: 2
 };
