@@ -57,8 +57,9 @@ var creepHandler = {
         var weightedRole = ['harvester', 'upgrader', 'builder', 'repair'];
         for (var i = 0; i < weightedRole.length; i++) {
             var role = weightedRole[i];
-            console.log('check role ' + role);
+            console.log('check role ' + role + ' (' + creation[role] + ')');
             if (creation[role] > 0) {
+                console.log('create creep role ' + role);
                 this.createCreep(spawn, role);
             }
         }
