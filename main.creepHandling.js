@@ -10,10 +10,10 @@
 // W25N58
  
 var limitation = {
-    repair: 1,
-    builder: 2,
+    harvester: 1,
     upgrader: 1,
-    harvester: 1
+    builder: 2,
+    repair: 1
 };
 
 var creepHandler = {
@@ -43,8 +43,11 @@ var creepHandler = {
      * @param spawn
      */
     checkCreepPopulation: function(spawn) {
+
         var creation = limitation;
-        for(var creepName in Game.creeps) {
+        var creepCount = 0;
+        for (var creepName in Game.creeps) {
+            creepCount ++;
             var creep = Game.creeps[creepName];
 
             if (!creep) {
@@ -52,6 +55,11 @@ var creepHandler = {
             }
 
             creation[creep.memory.role] -= 1;
+        }
+
+        if (creepCount == 0) {
+            this.createCreep(spawn, 'harvester');
+            return;
         }
 
         var weightedRole = ['harvester', 'upgrader', 'builder', 'repair'];
@@ -73,6 +81,7 @@ var creepHandler = {
      * @param role
      */
     createCreep: function(spawn, role) {
+        console.log('create ' + role);
         if (spawn.energy >= 200) {
             spawn.createCreep([WORK,CARRY,MOVE], null, {role: role});
         }
