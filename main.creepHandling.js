@@ -10,10 +10,10 @@
 // W25N58
  
 var limitation = {
-    harvester: 1,
+    repair: 1,
     builder: 2,
     upgrader: 1,
-    repair: 1,
+    harvester: 1,
 };
 
 var creepHandler = {
