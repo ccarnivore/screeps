@@ -26,18 +26,43 @@ var sourceHandler = {
 
     findSource: function(creep) {
         if (creep.memory.usedSourceId) {
-            return Game.getObjectById(creep.memory.usedSourceId);
+            var source = Game.getObjectById(creep.memory.usedSourceId);
+            if (!source || source == undefined) {
+                creep.memory.usedSourceId = null;
+            } else {
+                return source;
+            }
         }
 
+        var lastAssigned = Memory.lastAssignedSourceId, chosenSource;
         creep.say('searching...');
-        var mySource = Memory.sourceDict[0];
 
-        console.log(mySource.sourceId);
+        if (Memory.sourceDict.length > 1) {
+            if (lastAssigned) {
+                for (var currentSource in Memory.sourceDict) {
+                    var source = Memory.sourceDict[currentSource];
+                    if (source.sourceId == lastAssigned) {
+                        continue;
+                    }
 
-        creep.memory.usedSourceId = mySource.sourceId;
+                    chosenSource = source;
+                    break;
+                }
+            } else {
+                chosenSource = Memory.sourceDict[0];
+            }
+
+        } else if (Memory.sourceDict.length == 1) {
+            chosenSource = Memory.sourceDict[0];
+        } else {
+            return undefined;
+        }
+
+        creep.memory.usedSourceId = chosenSource.sourceId;
+        Memory.lastAssignedSourceId = chosenSource.sourceId;
         Memory.sourceDict[0].creeps.push(creep.id);
 
-        return Game.getObjectById(mySource.sourceId);
+        return Game.getObjectById(chosenSource.sourceId);
     },
 
     findContainer: function(creep) {

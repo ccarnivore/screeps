@@ -1,3 +1,4 @@
+
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
@@ -9,20 +10,6 @@ module.exports.loop = function () {
     
     creepHandler.wipeDead();
     creepHandler.checkCreepPopulation(Game.spawns['Spawn1']);
-
-    /*var tower = Game.getObjectById('b94effd8265d4ad18cc18e12');
-    if(tower) {
-        var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (structure) => structure.hits < structure.hitsMax
-        });
-        if(closestDamagedStructure) {
-            tower.repair(closestDamagedStructure);
-        }
-        var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if(closestHostile) {
-            tower.attack(closestHostile);
-        }
-    }*/
 
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
