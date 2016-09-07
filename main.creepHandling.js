@@ -22,7 +22,7 @@ var bodyCost = {
 var globalBuildPattern = {
     harvester: {
         pattern: [WORK, CARRY, MOVE],
-        extensionOrder: [CARRY, MOVE, WORK],
+        extensionOrder: [CARRY, WORK, MOVE],
         cost: 200
     },
     upgrader: {
