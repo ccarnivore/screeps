@@ -9,7 +9,11 @@
  
 // W25N58
 
-var weight = {
+var defaultCreationEnergy = 200;
+var buildOrder = [WORK, CARRY, MOVE];
+var minEnergyChunk = 50;
+
+var bodyCost = {
     WORK: 100,
     CARRY: 50,
     MOVE: 50,
@@ -104,11 +108,35 @@ var creepHandler = {
     createCreep: function(spawn, role) {
         console.log('try create ' + role);
         if (this.creationPossible(spawn)) {
-            var creationEnergy = this.getCreationEnergy(spawn);
-            console.log('creationEnergy: ' + creationEnergy);
-            var constructionPlan = globalBuildPattern[role];
-            var buildPattern = constructionPlan.pattern;
+            var creationEnergy = this.getCreationEnergy(spawn),
+                constructionPlan = globalBuildPattern[role],
+                buildPattern = constructionPlan.pattern,
+                diff = creationEnergy - defaultCreationEnergy;
 
+            console.log('creationEnergy: ' + creationEnergy);
+            console.log('buildPattern before: ' + buildPattern.toJSON());
+
+            if (diff >= minEnergyChunk) {
+                var i = 0, part, cost;
+                while (diff >= minEnergyChunk) {
+                    if (i > 2) {
+                        i = 0;
+                    }
+
+                    part = buildOrder[i];
+                    cost = bodyCost[part];
+
+                    if (diff - cost >= 0) {
+                        buildPattern.push(part);
+                    } else {
+                        break;
+                    }
+
+                    i++;
+                }
+            }
+
+            console.log('buildPattern after: ' + buildPattern.toJSON());
             spawn.createCreep(buildPattern, null, {role: role});
         } else {
             console.log('create ' + role + ' failed - no energy');
@@ -122,7 +150,7 @@ var creepHandler = {
      * @returns {boolean}
      */
     creationPossible: function(spawn) {
-        return spawn.energy >= 200;
+        return spawn.energy >= defaultCreationEnergy;
     },
 
     /**
