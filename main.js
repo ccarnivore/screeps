@@ -6,7 +6,7 @@ var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
 
 module.exports.loop = function () {
-    if (Memory.init == true) {
+    if (Memory.started != true) {
         return;
     }
 
