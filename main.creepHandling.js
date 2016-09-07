@@ -14,9 +14,9 @@ var buildOrder = [WORK, CARRY, MOVE];
 var minEnergyChunk = 50;
 
 var bodyCost = {
-    WORK: 100,
-    CARRY: 50,
-    MOVE: 50,
+    'work': 100,
+    'carry': 50,
+    'move': 50,
 };
 
 var globalBuildPattern = {
