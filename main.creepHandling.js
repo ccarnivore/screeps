@@ -13,7 +13,7 @@ var limitation = {
     repair: 1,
     builder: 2,
     upgrader: 1,
-    harvester: 1,
+    harvester: 1
 };
 
 var creepHandler = {
@@ -35,7 +35,9 @@ var creepHandler = {
         // initial start
         if (Game.creeps.length == 0) {
             if (spawn.energy >= 200) {
-                    spawn.createCreep([WORK,CARRY,MOVE], null, {role: 'harvester'});
+                spawn.createCreep([WORK,CARRY,MOVE], null, {role: 'harvester'});
+            } else {
+                return;
             }
         }
         
@@ -49,16 +51,35 @@ var creepHandler = {
         
             exists[creep.memory.role] -= 1;
         }
-        
-        
-        for (var role in exists) {
-            for (var i = 0; i < exists[role]; i++) {
-                if (spawn.energy >= 200) {
-                    spawn.createCreep([WORK,CARRY,MOVE], null, {role: role});
-                }
-            }
+
+        var weightedRole = ['harvester', 'upgrader', 'builder', 'repair'];
+        for (var role in weightedRole) {
+            console.log('lookup role ' + role);
+
         }
-        
+
+        /*if (exists['harvester'] < limitation['harvester']) {
+            this.createCreep(spawn, 'harvester');
+        }
+
+        if (exists['upgrader'] < limitation['upgrader']) {
+            this.createCreep(spawn, 'upgrader');
+        }
+
+        if (exists['builder'] < limitation['builder']) {
+            this.createCreep(spawn, 'builder');
+        }
+
+        if (exists['repair'] < limitation['repair']) {
+            this.createCreep(spawn, 'repair');
+        }*/
+
+    },
+
+    createCreep: function(spawn, role) {
+        if (spawn.energy >= 200) {
+            spawn.createCreep([WORK,CARRY,MOVE], null, {role: role});
+        }
     }
     
 }
