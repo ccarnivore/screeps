@@ -23,8 +23,7 @@ var sourceHandler = {
             }
         }
     },
-    
-    
+
     findSource: function(creep) {
         if (creep.memory.usedSourceId) {
             return Game.getObjectById(creep.memory.usedSourceId);
@@ -39,9 +38,44 @@ var sourceHandler = {
         Memory.sourceDict[0].creeps.push(creep.id);
 
         return Game.getObjectById(mySource.sourceId);
+    },
+
+    findContainer: function(creep) {
+        var mySource = this.findSource(creep);
+        var containerCollection = creep.room.find(
+            FIND_STRUCTURES, { filter: (structure) => { return (structure.structureType == STRUCTURE_CONTAINER ); }
+        });
+
+        var target = undefined;
+        var closest = undefined;
+        if (containerCollection.length) {
+            for (var i = 0; i < containerCollection.length; i++) {
+                var container = containerCollection[i];
+                if (container.store[RESOURCE_ENERGY] < 50) {
+                    continue;
+                }
+
+                var range = creep.pos.getRangeTo(container);
+                if (closest == undefined || range < closest) {
+                    target = container;
+                    closest = range;
+                }
+            }
+        }
+
+        if (target == undefined) {
+            return target;
+        }
+
+        var source = this.findSource(creep);
+        var rangeToSource = creep.pos.getRangeTo(container);
+
+        if (rangeToSource < closest) {
+            return undefined;
+        }
+
     }
-    
-    
+
 }
 
 module.exports = sourceHandler;

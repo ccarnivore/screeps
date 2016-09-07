@@ -29,6 +29,15 @@ var roleBuilder = {
             }
         }
         else {
+            var container = sourceHandler.findContainer(creep);
+            if (container != undefined) {
+                if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(container);
+                }
+
+                return;
+            }
+
             var mySource = sourceHandler.findSource(creep);
             if(creep.harvest(mySource) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(mySource);
