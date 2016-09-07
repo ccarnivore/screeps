@@ -114,7 +114,7 @@ var creepHandler = {
                 diff = creationEnergy - defaultCreationEnergy;
 
             console.log('creationEnergy: ' + creationEnergy);
-            console.log('buildPattern before: ' + buildPattern.toJSON());
+            console.log('buildPattern before: ' + JSON.stringify(buildPattern));
 
             if (diff >= minEnergyChunk) {
                 var i = 0, part, cost;
@@ -136,7 +136,7 @@ var creepHandler = {
                 }
             }
 
-            console.log('buildPattern after: ' + buildPattern.toJSON());
+            console.log('buildPattern after: ' + JSON.stringify(buildPattern));
             spawn.createCreep(buildPattern, null, {role: role});
         } else {
             console.log('create ' + role + ' failed - no energy');
