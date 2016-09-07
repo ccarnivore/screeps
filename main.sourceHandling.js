@@ -68,12 +68,11 @@ var sourceHandler = {
         }
 
         var source = this.findSource(creep);
-        var rangeToSource = creep.pos.getRangeTo(container);
-
-        if (rangeToSource < closest) {
+        if (creep.pos.getRangeTo(source) < closest) {
             return undefined;
         }
 
+        return target;
     }
 
 }
