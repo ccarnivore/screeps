@@ -15,6 +15,21 @@ var weight = {
     MOVE: 50,
 };
 
+var globalBuildPattern = {
+    harvester: {
+        pattern: [WORK, CARRY, MOVE],
+        cost: 200
+    },
+    upgrader: {
+        pattern: [WORK,CARRY,MOVE],
+        cost: 200
+    },
+    builder: {
+        pattern: [WORK,CARRY,MOVE],
+        cost: 200
+    }
+};
+
 var limitation = {
     harvester: 2,
     upgrader: 1,
@@ -89,7 +104,12 @@ var creepHandler = {
     createCreep: function(spawn, role) {
         console.log('try create ' + role);
         if (this.creationPossible(spawn)) {
-            spawn.createCreep([WORK,CARRY,MOVE], null, {role: role});
+            var creationEnergy = this.getCreationEnergy(spawn);
+            console.log('creationEnergy: ' + creationEnergy);
+            var constructionPlan = globalBuildPattern[role];
+            var buildPattern = constructionPlan.pattern;
+
+            spawn.createCreep(buildPattern, null, {role: role});
         } else {
             console.log('create ' + role + ' failed - no energy');
         }
@@ -103,7 +123,26 @@ var creepHandler = {
      */
     creationPossible: function(spawn) {
         return spawn.energy >= 200;
+    },
+
+    /**
+     *
+     * @param spawn
+     * @returns {number}
+     */
+    getCreationEnergy: function(spawn) {
+        var energy = spawn.energy;
+        var extensionCollection = spawn.room.find(FIND_STRUCTURES, {
+            filter: (structure) => { return (structure.structureType == STRUCTURE_EXTENSION)
+        });
+
+        for (var extension in extensionCollection) {
+            energy += extensionCollection[extension].energy;
+        }
+
+        return energy;
     }
+
     
 }
 

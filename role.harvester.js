@@ -11,21 +11,36 @@ var roleHarvester = {
         }
         else {
             var targets = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => { return structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity ||
-                (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity) ||
-                (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity) }
-            });
+                        filter: (structure) => { return (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity) ||
+                (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity) ||
+                (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity) }
+        });
 
             if(targets.length > 0) {
-                if(creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0]);
+                var target = undefined;
+                for (var currentTarget in targets) {
+                    if (targets[currentTarget].structureType == STRUCTURE_SPAWN) {
+                        target = currentTarget;
+                        break;
+                    }
+
+                    if (targets[currentTarget].structureType == STRUCTURE_EXTENSION) {
+                        target = currentTarget;
+                        break;
+                    }
+
+                    target = currentTarget;
+                }
+
+                if(creep.transfer(targets[target], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(targets[target]);
                 }
             } else {
 
                 // creep should wait at spawn
                 var spawn = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => { return (structure.structureType == STRUCTURE_SPAWN) }
-                });
+                        filter: (structure) => { return (structure.structureType == STRUCTURE_SPAWN) }
+            });
 
                 if (spawn.length > 0) {
                     creep.moveTo(spawn[0]);
