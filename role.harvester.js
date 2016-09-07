@@ -36,16 +36,10 @@ var roleHarvester = {
                     creep.moveTo(targets[target]);
                 }
             } else {
-
-                // creep should wait at spawn
-                var spawn = creep.room.find(FIND_STRUCTURES, {
-                        filter: (structure) => { return (structure.structureType == STRUCTURE_SPAWN) }
-            });
-
-                if (spawn.length > 0) {
-                    creep.moveTo(spawn[0]);
-
-                }
+                // nothing to do.. change role
+                creep.say('morph');
+                creep.memory.role = 'builder';
+                return;
 
             }
         }

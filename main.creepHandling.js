@@ -9,6 +9,7 @@
  
 // W25N58
 
+var creepLimit = 10;
 var defaultCreationEnergy = 200;
 var buildOrder = [WORK, CARRY, MOVE];
 var minEnergyChunk = 50;
@@ -36,8 +37,8 @@ var globalBuildPattern = {
 
 var limitation = {
     harvester: 2,
-    upgrader: 1,
-    builder: 2
+    upgrader: 2,
+    builder: 6
 };
 
 var creepHandler = {
@@ -83,6 +84,10 @@ var creepHandler = {
 
         if (creepCount == 0) {
             this.createCreep(spawn, 'harvester');
+            return;
+        }
+
+        if (creepCount >= creepLimit) {
             return;
         }
 
