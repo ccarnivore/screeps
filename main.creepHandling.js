@@ -43,8 +43,7 @@ var creepHandler = {
      * @param spawn
      */
     checkCreepPopulation: function(spawn) {
-
-        var creation = limitation;
+        var creation = {};
         var creepCount = 0;
         for (var creepName in Game.creeps) {
             creepCount ++;
@@ -54,7 +53,7 @@ var creepHandler = {
                 wipeDead(creepName);
             }
 
-            creation[creep.memory.role] -= 1;
+            creation[creep.memory.role] += 1;
         }
 
         if (creepCount == 0) {
@@ -62,12 +61,8 @@ var creepHandler = {
             return;
         }
 
-        var weightedRole = ['harvester', 'upgrader', 'builder', 'repair'];
-        for (var i = 0; i < weightedRole.length; i++) {
-            var role = weightedRole[i];
-            console.log('check role ' + role + ' (' + creation[role] + ')');
-            if (creation[role] > 0 && spawn.energy >= 200) {
-                console.log('create creep role ' + role);
+        for (var role in limitation) {
+            if (creation[role] < limitation[role]) {
                 this.createCreep(spawn, role);
             }
         }
