@@ -11,7 +11,6 @@
 
 var creepLimit = 10;
 var defaultCreationEnergy = 200;
-var buildOrder = [WORK, CARRY, MOVE];
 var minEnergyChunk = 50;
 
 var bodyCost = {
@@ -23,22 +22,25 @@ var bodyCost = {
 var globalBuildPattern = {
     harvester: {
         pattern: [WORK, CARRY, MOVE],
+        extensionOrder: [CARRY, MOVE, WORK],
         cost: 200
     },
     upgrader: {
         pattern: [WORK,CARRY,MOVE],
+        extensionOrder: [WORK, CARRY, MOVE],
         cost: 200
     },
     builder: {
         pattern: [WORK,CARRY,MOVE],
+        extensionOrder: [WORK, CARRY, MOVE],
         cost: 200
     }
 };
 
 var limitation = {
-    harvester: 2,
+    harvester: 3,
     upgrader: 3,
-    builder: 5
+    builder: 4
 };
 
 var creepHandler = {
@@ -116,6 +118,7 @@ var creepHandler = {
             var creationEnergy = this.getCreationEnergy(spawn),
                 constructionPlan = globalBuildPattern[role],
                 buildPattern = constructionPlan.pattern,
+                buildOrder = constructionPlan.extensionOrder,
                 diff = creationEnergy - defaultCreationEnergy;
 
             console.log('creationEnergy: ' + creationEnergy);
