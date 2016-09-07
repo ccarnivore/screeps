@@ -58,7 +58,7 @@ var creepHandler = {
         for (var i = 0; i < weightedRole.length; i++) {
             var role = weightedRole[i];
             console.log('check role ' + role + ' (' + creation[role] + ')');
-            if (creation[role] > 0) {
+            if (creation[role] > 0 && spawn.energy >= 200) {
                 console.log('create creep role ' + role);
                 this.createCreep(spawn, role);
             }
