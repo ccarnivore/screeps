@@ -17,7 +17,12 @@ var limitation = {
 };
 
 var creepHandler = {
-    
+
+    /**
+     * wipe out dead creeps memory
+     *
+     * @param creep
+     */
     wipeDead: function(creep) {
         if (creep != undefined) {
             delete Memory.creeps[creep];
@@ -30,38 +35,42 @@ var creepHandler = {
             }
         }
     },
-  
+
+    /**
+     * checks creeps population
+     * to fixed limits
+     *
+     * @param spawn
+     */
     checkCreepPopulation: function(spawn) {
-        // initial start
-        if (Game.creeps.length == 0) {
-            if (spawn.energy >= 200) {
-                spawn.createCreep([WORK,CARRY,MOVE], null, {role: 'harvester'});
-            } else {
-                return;
-            }
-        }
-        
-        var exists = limitation;
+        var creation = limitation;
         for(var creepName in Game.creeps) {
             var creep = Game.creeps[creepName];
-            
+
             if (!creep) {
                 wipeDead(creepName);
             }
-        
-            exists[creep.memory.role] -= 1;
+
+            creation[creep.memory.role] -= 1;
         }
 
         var weightedRole = ['harvester', 'upgrader', 'builder', 'repair'];
         for (var i = 0; i < weightedRole.length; i++) {
             var role = weightedRole[i];
-            if (exists[role] < limitation[role]) {
+            console.log('check role ' + role);
+            if (creation[role] > 0) {
                 this.createCreep(spawn, role);
             }
         }
 
     },
 
+    /**
+     * creates a creep
+     *
+     * @param spawn
+     * @param role
+     */
     createCreep: function(spawn, role) {
         if (spawn.energy >= 200) {
             spawn.createCreep([WORK,CARRY,MOVE], null, {role: role});
