@@ -148,7 +148,8 @@ var creepHandler = {
             console.log('buildPattern after: ' + JSON.stringify(buildPattern));
             var arguments = {role: role, canRepair: false};
             if (role == 'builder') {
-                arguments.canRepair = !Memory.isRepairBuilder;
+                Memory.isRepairBuilder = !Memory.isRepairBuilder;
+                arguments.canRepair = Memory.isRepairBuilder;
             }
             spawn.createCreep(buildPattern, null, arguments);
         } else {
