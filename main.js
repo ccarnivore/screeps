@@ -6,9 +6,6 @@ var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
 
 module.exports.loop = function () {
-    if (Memory.started != true) {
-        return;
-    }
 
     sourceHandler.globalLookUp(Game.spawns['Spawn1']);
     
