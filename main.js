@@ -50,9 +50,10 @@ module.exports.loop = function () {
 
             default: {
                 creep.say('no role. suicide');
+                console.log(creep.id + ' suicide - no role');
                 creep.suicide();
             }
-            
+
         }
     }
 }
