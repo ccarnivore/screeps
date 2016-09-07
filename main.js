@@ -1,10 +1,9 @@
-
+require('main.const');
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
-var c = require('main.const');
 
 module.exports.loop = function () {
     sourceHandler.globalLookUp(Game.spawns['Spawn1']);
