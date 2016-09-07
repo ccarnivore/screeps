@@ -17,16 +17,15 @@ var roleBuilder = {
             });
 
             if (repairTargets.length) {
-                creep.say('repairing');
                 if(creep.repair(repairTargets[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(repairTargets[0]);
                 }
+
                 return;
             }
 
             var buildTargets = creep.room.find(FIND_CONSTRUCTION_SITES);
             if(buildTargets.length) {
-                creep.say('building');
                 if(creep.build(buildTargets[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(buildTargets[0]);
                 }
