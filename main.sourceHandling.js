@@ -43,7 +43,10 @@ var sourceHandler = {
     findContainer: function(creep) {
         var mySource = this.findSource(creep);
         var containerCollection = creep.room.find(
-            FIND_STRUCTURES, { filter: (structure) => { return (structure.structureType == STRUCTURE_CONTAINER ); }
+            FIND_STRUCTURES, { filter: (structure) => {
+                    return (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity) ||
+            (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity) ||
+            (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity); }
         });
 
         var target = undefined;
