@@ -67,9 +67,7 @@ var creepHandler = {
         }
 
         for (var role in limitation) {
-            console.log('check ' + role);
             if (creation[role] < limitation[role]) {
-                console.log(role + ' matches creation');
                 this.createCreep(spawn, role);
                 return;
             }
@@ -85,10 +83,10 @@ var creepHandler = {
      */
     createCreep: function(spawn, role) {
         console.log('try create ' + role);
-        if (spawn.energy >= 200) {
+        if (this.creationPossible(spawn)) {
             spawn.createCreep([WORK,CARRY,MOVE], null, {role: role});
         } else {
-            console.log('create ' + role + ' failed');
+            console.log('create ' + role + ' failed - no energy');
         }
     },
 
