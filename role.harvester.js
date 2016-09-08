@@ -1,8 +1,8 @@
 var ENERGY_RELEVANCE = {
     'spawn': 100,
-    'tower': 80,
-    'extension': 75,
-    'container': 70
+    'tower': 70,
+    'extension': 80,
+    'container': 75
 };
 
 var sourceHandler = require('main.sourceHandling');
