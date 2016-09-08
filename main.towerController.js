@@ -19,7 +19,7 @@ var towerController = {
 
         if(injuredCreeps.length > 0) {
             var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
-            towers.forEach(tower = > {if (tower.energy >= 100) tower.heal(injuredCreeps[0]) });
+            towers.forEach(tower => {if (tower.energy >= 100) tower.heal(injuredCreeps[0]) });
         }
     },
 
