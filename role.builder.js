@@ -57,20 +57,20 @@ var roleBuilder = {
                     defaultFactor = 2;
 
                 var factorA = defaultFactor;
-                if (a.hitsMax > 100000000) {
+                if (a.hitsMax >= 100000000) {
                     factorA = defaultFactor * 20000;
-                } else if (a.hitsMax > 1000000) {
+                } else if (a.hitsMax >= 1000000) {
                     factorA = defaultFactor * 20;
-                } else if (a.hitsMax > 100000) {
+                } else if (a.hitsMax >= 100000) {
                     factorA = defaultFactor * 2;
                 }
 
                 var factorB = defaultFactor;
-                if (b.hitsMax > 100000000) {
+                if (b.hitsMax >= 100000000) {
                     factorA = defaultFactor * 20000;
-                } else if (b.hitsMax > 1000000) {
+                } else if (b.hitsMax >= 1000000) {
                     factorA = defaultFactor * 20;
-                } else if (b.hitsMax > 100000) {
+                } else if (b.hitsMax >= 100000) {
                     factorA = defaultFactor * 2;
                 }
 
