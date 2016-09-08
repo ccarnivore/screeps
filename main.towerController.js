@@ -39,7 +39,7 @@ var towerController = {
                 return false;
             }
 
-            tower.repair(repairtTargets[0]);
+            tower.repair(repairTargets[0]);
         });
 
         return true;
