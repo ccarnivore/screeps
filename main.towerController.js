@@ -52,7 +52,7 @@ var towerController = {
      */
     repairStructures: function(room) {
         var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
-        towers.forEach(tower => { if (tower.energy <= 30) { return };
+        towers.forEach(tower => { if (tower.energy <= 150) { return };
             var repairTarget;
             Memory.tower = Memory.tower || {};
             var towerData = Memory.tower[tower.id];
