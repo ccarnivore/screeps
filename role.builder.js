@@ -52,17 +52,37 @@ var roleBuilder = {
                     valABase = a.hitsMax,
                     valBSource = b.hits,
                     valBBase = b.hitsMax,
-                    factorA = REPAIR_RELEVANCE[a.type],
-                    factorB = REPAIR_RELEVANCE[b.type],
-                    minA = valASource / (valABase / minHitsFactor),
-                    minB = valBSource / (valBBase / minHitsFactor);
+                    relevanceA = REPAIR_RELEVANCE[a.type],
+                    relevanceB = REPAIR_RELEVANCE[b.type],
+                    defaultFactor = 2;
+
+                var factorA = defaultFactor;
+                if (a.hitsMax > 100000000) {
+                    factorA = defaultFactor * 20000;
+                } else if (a.hitsMax > 1000000) {
+                    factorA = defaultFactor * 200;
+                } else if (a.hitsMax > 100000) {
+                    factorA = defaultFactor * 20;
+                }
+
+                var factorB = defaultFactor;
+                if (b.hitsMax > 100000000) {
+                    factorA = defaultFactor * 20000;
+                } else if (b.hitsMax > 1000000) {
+                    factorA = defaultFactor * 200;
+                } else if (b.hitsMax > 100000) {
+                    factorA = defaultFactor * 20;
+                }
+
+                var minA = valASource / (valABase / factorA),
+                    minB = valBSource / (valBBase / factorB);
 
                 if (minA < 0.5 && minB < 0.5) {
                     if (a.type == b.type) {
                         return (valASource / valABase) - (valBSource / valBBase);
                     }
 
-                    return factorB - factorA;
+                    return relevanceB - relevanceA;
                 }
 
                 if (minA > 0.5) {
