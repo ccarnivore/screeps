@@ -49,10 +49,27 @@ var roleBuilder = {
                 var valASource = a.hits,
                     valABase = a.hitsMax,
                     valBSource = b.hits,
-                    valBBase = b.hitsMax;
+                    valBBase = b.hitsMax,
+                    factorA = REPAIR_RELEVANCE[a.type],
+                    factorB = REPAIR_RELEVANCE[b.type],
+                    minA = valASource / (valABase / 4),
+                    minB = valBSource / (valBBase / 4);
 
-                var diffFactor = a.hitsMax / b.hitsMax;
-                return ((valASource * diffFactor) / valABase) - ((valBSource * diffFactor) / valBBase);
+                if (minA < 0.5 && minB < 0.5) {
+                    if (a.type == b.type) {
+                        return (valASource / valABase) - (valBSource / valBBase);
+                    }
+
+                    return factorB - factorA;
+                }
+
+                if (minA > 0.5) {
+                    return 1;
+                }
+
+                if (minB > 0.5) {
+                    return -1;
+                }
             });
 
             this._repair(creep, repairTargets[0], true);
