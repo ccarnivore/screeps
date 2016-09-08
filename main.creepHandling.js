@@ -9,7 +9,7 @@
  
 // W25N58
 
-var creepLimit = 10;
+var creepLimit = 20;
 var defaultCreationEnergy = 200;
 var minEnergyChunk = 50;
 
@@ -32,9 +32,9 @@ var globalBuildPattern = {
 };
 
 var limitation = {
-    harvester: 3,
-    upgrader: 1,
-    builder: 6
+    harvester: 4,
+    upgrader: 6,
+    builder: 10
 };
 
 var creepHandler = {
