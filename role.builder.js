@@ -22,7 +22,7 @@ var roleBuilder = {
     repair: function(creep) {
         if (creep.memory.repairTargetId) {
             if (creep.memory.repairTargetTime && ((Game.time - creep.memory.repairTargetTime) < 5)) {
-                var target = Game.getObjectById(targetId);
+                var target = Game.getObjectById(creep.memory.repairTargetId);
                 if (target && (target.hits < target.hitsMax)) {
                     this._repair(creep, target, false);
                     return true;
