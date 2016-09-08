@@ -13,7 +13,7 @@ var roleBuilder = {
 
     _repair: function(creep, target, newTarget) {
         if (newTarget) {
-            console.log('set new repair target');
+            console.log('set new repair target ' + target + ' (' + target.pos + ')');
             creep.memory.repairTargetId = target.id;
             creep.memory.repairTargetTime = Game.time;
         }
