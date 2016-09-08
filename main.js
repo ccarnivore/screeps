@@ -13,9 +13,12 @@ module.exports.loop = function () {
     creepHandler.wipeDead();
     creepHandler.checkCreepPopulation(spawn);
 
-    towerController.defendRoom(spawn.room);
-    towerController.healCreeps(spawn.room);
-    towerController.repairStructures(spawn.room);
+    if (!towerController.defendRoom(spawn.room)) {
+        if (!towerController.healCreeps(spawn.room)) {
+            towerController.repairStructures(spawn.room);
+        }
+    }
+
 
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
