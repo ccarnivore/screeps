@@ -1,4 +1,4 @@
-require('main.const');
+var constants = require('main.const');
 
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
