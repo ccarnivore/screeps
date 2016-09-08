@@ -13,6 +13,16 @@ var roleBuilder = {
         });
 
         if (repairTargets.length) {
+            repairTargets.sort(function(a, b) {
+                var valASource = a.hits,
+                    valABase = a.hitsMax,
+                    valBSource = b.hits,
+                    valBBase = b.hitsMax;
+
+                var diffFactor = a.hitsMax / b.hitsMax;
+                return ((valASource * diffFactor) / valABase) - ((valBSource * diffFactor) / valBBase);
+            });
+
             if (creep.repair(repairTargets[0]) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(repairTargets[0]);
             }
