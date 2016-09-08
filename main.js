@@ -3,12 +3,17 @@ var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
+var defender = require('main.defending');
 
 module.exports.loop = function () {
-    sourceHandler.globalLookUp(Game.spawns['Spawn1']);
+    var spawn = Game.spawns['Spawn1'];
+
+    sourceHandler.globalLookUp(spawn);
     
     creepHandler.wipeDead();
-    creepHandler.checkCreepPopulation(Game.spawns['Spawn1']);
+    creepHandler.checkCreepPopulation(spawn);
+
+    defender.defendRoom(spawn.room);
 
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
