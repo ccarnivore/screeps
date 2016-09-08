@@ -58,7 +58,7 @@ var roleBuilder = {
 
                 var factorA = defaultFactor;
                 if (a.hitsMax > 100000000) {
-                    factorA = defaultFactor * 20000;
+                    factorA = defaultFactor * 200000;
                 } else if (a.hitsMax > 1000000) {
                     factorA = defaultFactor * 200;
                 } else if (a.hitsMax > 100000) {
