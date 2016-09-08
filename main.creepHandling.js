@@ -6,8 +6,6 @@
  * var mod = require('main.creepHandling');
  * mod.thing == 'a thing'; // true
  */
- 
-// W25N58
 
 var creepLimit = 14;
 var minEnergyChunk = 50;
