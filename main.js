@@ -33,7 +33,6 @@ module.exports.loop = function () {
             }
 
             case 'harvester':
-            default: {
                 roleHarvester.run(creep);
                 break;
             }

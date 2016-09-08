@@ -1,8 +1,8 @@
 var ENERGY_RELEVANCE = {
     'spawn': 100,
-    'tower': 70,
+    'tower': 75,
     'extension': 80,
-    'container': 75
+    'container': 70
 };
 
 var sourceHandler = require('main.sourceHandling');
@@ -11,7 +11,7 @@ var roleHarvester = {
     /** @param {Creep} creep **/
     run: function(creep) {
         if(creep.carry.energy < creep.carryCapacity) {
-            var droppedEnergyCollection = creep.pos.findInRange(FIND_DROPPED_ENERGY, 5);
+            var droppedEnergyCollection = creep.pos.findInRange(FIND_DROPPED_ENERGY, 1);
             if (droppedEnergyCollection.length) {
                 if (creep.pickup(droppedEnergyCollection[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(droppedEnergyCollection[0]);
