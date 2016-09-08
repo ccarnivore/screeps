@@ -8,8 +8,6 @@ var REPAIR_RELEVANCE = {
     'road': 50
 };
 
-var minHitsFactor = 2;
-
 var sourceHandler = require('main.sourceHandling');
 var roleBuilder = {
 
@@ -52,8 +50,6 @@ var roleBuilder = {
                     valABase = a.hitsMax,
                     valBSource = b.hits,
                     valBBase = b.hitsMax,
-                    relevanceA = REPAIR_RELEVANCE[a.type],
-                    relevanceB = REPAIR_RELEVANCE[b.type],
                     defaultFactor = 2;
 
                 var factorA = defaultFactor;
@@ -62,7 +58,7 @@ var roleBuilder = {
                 } else if (a.hitsMax >= 1000000) {
                     factorA = defaultFactor * 200;
                 } else if (a.hitsMax >= 100000) {
-                    factorA = defaultFactor * 2;
+                    factorA = defaultFactor * 20;
                 }
 
                 var factorB = defaultFactor;
@@ -74,24 +70,10 @@ var roleBuilder = {
                     factorB = defaultFactor * 2;
                 }
 
-                var minA = valASource / (valABase / factorA),
-                    minB = valBSource / (valBBase / factorB);
+                var minA = Math.abs(valASource / (valABase / factorA)),
+                    minB = Math.abs(valBSource / (valBBase / factorB));
 
-                if (minA < 0.5 && minB < 0.5) {
-                    if (a.type == b.type) {
-                        return (valASource / valABase) - (valBSource / valBBase);
-                    }
-
-                    return relevanceB - relevanceA;
-                }
-
-                if (minA > 0.5) {
-                    return 1;
-                }
-
-                if (minB > 0.5) {
-                    return -1;
-                }
+                return minA - minB;
             });
 
             this._repair(creep, repairTargets[0], true);
