@@ -33,7 +33,7 @@ var globalBuildPattern = {
 
 var limitation = {
     harvester: 4,
-    upgrader: 6,
+    upgrader: 4,
     builder: 10
 };
 
