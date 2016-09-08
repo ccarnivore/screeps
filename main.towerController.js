@@ -56,7 +56,11 @@ var towerController = {
             var repairTarget;
             Memory.tower = Memory.tower || {};
             var towerData = Memory.tower[tower.id];
-            if (towerData && towerData.repairObjectId && ((Game.time - towerData.repairObjectTime) < 50)) {
+            if (!towerData) {
+                Memory.tower[tower.id] = {};
+            }
+
+            if (towerData.repairObjectId && ((Game.time - towerData.repairObjectTime) < 50)) {
                 repairTarget = Game.getObjectById(towerData.repairObjectId);
                 if (repairTarget) {
                     tower.repair(repairTarget);
