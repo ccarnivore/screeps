@@ -1,6 +1,18 @@
 var sourceHandler = require('main.sourceHandling');
 var roleBuilder = {
 
+    _repair: function(creep, target, newTarget) {
+        if (newTarget) {
+            console.log('set new repair target');
+            creep.memory.repairTargetId = target.id;
+            creep.memory.repairTargetTime = Game.time;
+        }
+
+        if (creep.repair(target) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+        }
+    },
+
     /**
      * creeps repair routine
      *
@@ -8,8 +20,18 @@ var roleBuilder = {
      * @returns {boolean}
      */
     repair: function(creep) {
+        if (creep.memory.repairTargetId) {
+            if (creep.memory.repairTargetTime && ((Game.time - creep.memory.repairTargetTime) < 5)) {
+                var target = Game.getObjectById(targetId);
+                if (target && (target.hits < target.hitsMax)) {
+                    this._repair(creep, target, false);
+                    return true;
+                }
+            }
+        }
+
         var repairTargets = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => {return structure.hits < structure.hitsMax}
+            filter: (structure) => {return structure.hits < structure.hitsMax}
         });
 
         if (repairTargets.length) {
@@ -23,10 +45,7 @@ var roleBuilder = {
                 return ((valASource * diffFactor) / valABase) - ((valBSource * diffFactor) / valBBase);
             });
 
-            if (creep.repair(repairTargets[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(repairTargets[0]);
-            }
-
+            this._repair(creep, repairTargets[0], true);
             return true;
         }
 
