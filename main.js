@@ -3,7 +3,7 @@ var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
-var defender = require('main.defending');
+var towerController = require('main.towerController');
 
 module.exports.loop = function () {
     var spawn = Game.spawns['Spawn1'];
@@ -13,7 +13,9 @@ module.exports.loop = function () {
     creepHandler.wipeDead();
     creepHandler.checkCreepPopulation(spawn);
 
-    defender.defendRoom(spawn.room);
+    towerController.defendRoom(spawn.room);
+    towerController.healCreeps(spawn.room);
+    towerController.repairStructures(spawn.room);
 
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
