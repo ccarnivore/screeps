@@ -25,33 +25,12 @@ var roleHarvester = {
                 }
             });
 
-            targets.sort(function(a, b) {
-                console.log(a, b);
-            });
-
             if(targets.length > 0) {
-                var target = undefined;
-                for (var currentTarget in targets) {
-                    if (targets[currentTarget].structureType == STRUCTURE_SPAWN) {
-                        target = currentTarget;
-                        break;
-                    }
-
-                    if (targets[currentTarget].structureType == STRUCTURE_EXTENSION) {
-                        target = currentTarget;
-                        break;
-                    }
-
-                    if (targets[currentTarget].structureType == STRUCTURE_TOWER) {
-                        target = currentTarget;
-                        break;
-                    }
-
-                    target = currentTarget;
-                }
-
-                if(creep.transfer(targets[target], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[target]);
+                targets.sort(function(a, b) {
+                    return ENERGY_RELEVANCE[b.structureType] - ENERGY_RELEVANCE[a.structureType]
+                });
+                if(creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(targets[0]);
                 }
             } else {
                 // nothing to do.. change role
