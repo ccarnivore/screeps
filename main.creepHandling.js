@@ -16,17 +16,17 @@ var minEnergyChunk = 50;
 var globalBuildPattern = {
     harvester: {
         pattern: [WORK, CARRY, MOVE],
-        extensionOrder: [CARRY, WORK, MOVE],
+        extensionOrder: [CARRY, CARRY, WORK, MOVE],
         cost: 200
     },
     upgrader: {
         pattern: [WORK,CARRY,MOVE],
-        extensionOrder: [WORK, CARRY, MOVE],
+        extensionOrder: [WORK, WORK, CARRY, MOVE],
         cost: 200
     },
     builder: {
         pattern: [WORK,CARRY,MOVE],
-        extensionOrder: [WORK, CARRY, MOVE],
+        extensionOrder: [WORK, WORK, CARRY, CARRY, MOVE],
         cost: 200
     }
 };
@@ -121,7 +121,7 @@ var creepHandler = {
             if (diff >= minEnergyChunk) {
                 var i = 0, part, cost;
                 while (diff >= minEnergyChunk) {
-                    if (i > 2) {
+                    if (i == buildOrder.length) {
                         i = 0;
                     }
 

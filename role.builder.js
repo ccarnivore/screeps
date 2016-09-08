@@ -1,9 +1,9 @@
 var REPAIR_RELEVANCE = {
     'spawn': 100,
     'tower': 75,
+    'rampart': 73,
     'extension': 70,
     'container': 70,
-    'rampart': 61,
     'constructedWall': 60,
     'road': 10
 };
