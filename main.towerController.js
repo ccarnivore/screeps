@@ -71,8 +71,7 @@ var towerController = {
             }
 
             var repairTargets = tower.pos.findInRange(
-                FIND_MY_STRUCTURES, 5, {filter: (structure) => { return structure.structureType != STRUCTURE_WALL
-                && structure.hits < structure.hitsMax }
+                FIND_MY_STRUCTURES, 5, {filter: (structure) => { return structure.hits < structure.hitsMax }
             });
             if (repairTargets.length == 0) {
                 return false;
