@@ -33,6 +33,16 @@ var towerController = {
 
     repairStructures: function(room) {
         var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
+        towers.forEach(tower => { if (tower.energy <= 50) { return };
+            var repairTargets = tower.pos.findInRange(FIND_MY_STRUCTURES, 5, {filter: (structure) => { return structure.hits < structure.hitsMax } });
+            if (repairTargets.length == 0) {
+                return false;
+            }
+
+            tower.repair(repairtTargets[0]);
+        });
+
+        return true;
     }
 };
 
