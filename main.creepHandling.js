@@ -10,7 +10,6 @@
 // W25N58
 
 var creepLimit = 14;
-var defaultCreationEnergy = 200;
 var minEnergyChunk = 50;
 
 var globalBuildPattern = {
@@ -20,14 +19,14 @@ var globalBuildPattern = {
         cost: 200
     },
     upgrader: {
-        pattern: [WORK,CARRY,MOVE],
-        extensionOrder: [WORK, WORK, CARRY, MOVE],
-        cost: 200
+        pattern: [WORK, WORK, CARRY, CARRY, MOVE],
+        extensionOrder: [WORK, CARRY, WORK, CARRY, MOVE],
+        cost: 350
     },
     builder: {
-        pattern: [WORK,CARRY,MOVE],
-        extensionOrder: [WORK, WORK, CARRY, CARRY, MOVE],
-        cost: 200
+        pattern: [WORK,WORK,CARRY,CARRY,MOVE],
+        extensionOrder: [WORK, CARRY, WORK, CARRY, MOVE],
+        cost: 350
     }
 };
 
@@ -113,7 +112,7 @@ var creepHandler = {
                 constructionPlan = globalBuildPattern[role],
                 buildPattern = constructionPlan.pattern.slice(0),
                 buildOrder = constructionPlan.extensionOrder.slice(0),
-                diff = creationEnergy - defaultCreationEnergy;
+                diff = creationEnergy - constructionPlan.cost;
 
             console.log('creationEnergy: ' + creationEnergy);
             console.log('buildPattern before: ' + JSON.stringify(buildPattern));
