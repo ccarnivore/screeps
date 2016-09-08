@@ -39,6 +39,7 @@ var roleHarvester = {
                 // nothing to do.. change role
                 creep.say('morph');
                 creep.memory.role = 'builder';
+                creep.memory.canRepair = true;
                 return;
 
             }
