@@ -154,7 +154,7 @@ var creepHandler = {
      * @returns {boolean}
      */
     creationPossible: function(spawn) {
-        return spawn.energy >= defaultCreationEnergy;
+        return spawn.energy >= 200;
     },
 
     /**
