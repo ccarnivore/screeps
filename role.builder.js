@@ -60,7 +60,7 @@ var roleBuilder = {
                 if (a.hitsMax >= 100000000) {
                     factorA = defaultFactor * 20000;
                 } else if (a.hitsMax >= 1000000) {
-                    factorA = defaultFactor * 20;
+                    factorA = defaultFactor * 200;
                 } else if (a.hitsMax >= 100000) {
                     factorA = defaultFactor * 2;
                 }
@@ -69,7 +69,7 @@ var roleBuilder = {
                 if (b.hitsMax >= 100000000) {
                     factorA = defaultFactor * 20000;
                 } else if (b.hitsMax >= 1000000) {
-                    factorA = defaultFactor * 20;
+                    factorA = defaultFactor * 200;
                 } else if (b.hitsMax >= 100000) {
                     factorA = defaultFactor * 2;
                 }
