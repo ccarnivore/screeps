@@ -1,11 +1,11 @@
 var REPAIR_RELEVANCE = {
     'spawn': 100,
-    'tower': 75,
-    'rampart': 73,
+    'tower': 90,
+    'rampart': 80,
     'extension': 70,
     'container': 70,
-    'constructedWall': 60,
-    'road': 10
+    'constructedWall': 10,
+    'road': 50
 };
 
 var minHitsFactor = 2;
