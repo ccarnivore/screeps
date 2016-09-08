@@ -47,7 +47,7 @@ var roleBuilder = {
             ) || (
                 structure.structureType == STRUCTURE_ROAD && structure.hits < (structure.hitsMax / 2)
             ) || (
-                structure.structureType == STRUCTURE_WALL && structure.hits < (structure.hitsMax / 6000)
+                structure.structureType == STRUCTURE_WALL && structure.hits < (structure.hitsMax / 30000)
             )
              }
         });
