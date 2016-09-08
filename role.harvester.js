@@ -1,9 +1,9 @@
-var ENERGY_RELEVANCE = [
-    { 'spawn': 100 },
-    { 'tower': 75 },
-    { 'extension': 75 },
-    { 'container': 70 }
-];
+var ENERGY_RELEVANCE = {
+    'spawn': 100,
+    'tower': 80,
+    'extension': 75,
+    'container': 70
+};
 
 var sourceHandler = require('main.sourceHandling');
 var roleHarvester = {
