@@ -16,19 +16,19 @@ module.exports.loop = function () {
         var creep = Game.creeps[name];
         switch(creep.memory.role) {
             //case 'builder': {
-            case ROLE_BUILDER: {
+            case constants.ROLE_BUILDER: {
                 roleBuilder.run(creep);
                 break;
             }
             
             //case 'upgrader': {
-            case ROLE_UPGRADER: {
+            case constants.ROLE_UPGRADER: {
                 roleUpgrader.run(creep);
                 break;
             }
             
             //case 'harvester': {
-            case ROLE_HARVESTER: {
+            case constants.ROLE_HARVESTER: {
                 roleHarvester.run(creep);
                 break;
             }

@@ -13,9 +13,9 @@
  }
  }*/
 
-const ROLE_BUILDER = 'builder';
-const ROLE_HARVESTER = 'harvester';
-const ROLE_UPGRADER = 'upgrader';
+var ROLE_BUILDER = 'builder';
+var ROLE_HARVESTER = 'harvester';
+var ROLE_UPGRADER = 'upgrader';
 
 const REPAIR_RELEVANCE = [
     { 'spawn': 100 },
