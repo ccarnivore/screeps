@@ -149,6 +149,7 @@ var roleBuilder = {
 
             if (container != undefined) {
                 var containerRange = creep.pos.getRangeTo(container);
+
                 if (containerRange <= sourceRange) {
                     if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(container);

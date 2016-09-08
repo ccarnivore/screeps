@@ -9,7 +9,8 @@ var towerController = {
      */
     defendRoom: function(room) {
         var hostiles = room.find(FIND_HOSTILE_CREEPS);
-        if (hostiles.length == 0) {
+        Memory.invaderSpotted = !hostiles.length;
+        if (!Memory.invaderSpotted) {
             return false;
         }
 

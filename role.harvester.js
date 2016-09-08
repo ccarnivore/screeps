@@ -27,7 +27,19 @@ var roleHarvester = {
 
             if(targets.length > 0) {
                 targets.sort(function(a, b) {
-                    return ENERGY_RELEVANCE[b.structureType] - ENERGY_RELEVANCE[a.structureType]
+                    var relevanceA = ENERGY_RELEVANCE[a.structureType],
+                        relevanceB = ENERGY_RELEVANCE[b.structureType];
+
+                    if (Memory.invaderSpotted === true) {
+                        if (a.structureType == STRUCTURE_TOWER) {
+                            relevanceA += 1000;
+                        }
+                        if (b.structureType == STRUCTURE_TOWER) {
+                            relevanceB += 1000;
+                        }
+                    }
+
+                    return relevanceB - relevanceA;
                 });
                 if(creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(targets[0]);
