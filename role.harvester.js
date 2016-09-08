@@ -3,7 +3,6 @@ var roleHarvester = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        console.log(ROLE_HARVESTER);
         if(creep.carry.energy < creep.carryCapacity) {
             var mySource = sourceHandler.findSource(creep);
             if(creep.harvest(mySource) == ERR_NOT_IN_RANGE) {
