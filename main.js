@@ -32,16 +32,11 @@ module.exports.loop = function () {
                 roleUpgrader.run(creep);
                 break;
             }
-            
-            case 'harvester': {
+
+            case 'harvester':
+            default: {
                 roleHarvester.run(creep);
                 break;
-            }
-
-            default: {
-                creep.say('no known role. suicide');
-                console.log(creep.id + ' suicide - no role');
-                creep.suicide();
             }
 
         }
