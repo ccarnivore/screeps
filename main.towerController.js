@@ -33,6 +33,10 @@ var towerController = {
             return false;
         }
 
+        injuredCreeps.sort(function (a, b) {
+            return a.hits / a.hitsMax - b.hits / b.hitsMax;
+        });
+
         var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
         towers.forEach(tower => {if (tower.energy >= 100) tower.heal(injuredCreeps[0]) });
 
@@ -49,6 +53,17 @@ var towerController = {
     repairStructures: function(room) {
         var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
         towers.forEach(tower => { if (tower.energy <= 100) { return };
+            var repairTarget;
+            Memory.tower = Memory.tower || {};
+            var towerData = Memory.tower[tower.id];
+            if (towerData && towerData.repairObjectId && ((Game.time - towerData.repairObjectTime) < 50)) {
+                repairTarget = Game.getObjectById(towerData.repairObjectId);
+                if (repairTarget) {
+                    tower.repair(repairTarget);
+
+                    return true;
+                }
+            }
 
             var repairTargets = tower.pos.findInRange(
                 FIND_MY_STRUCTURES, 5, {filter: (structure) => { return structure.structureType != STRUCTURE_WALL
@@ -62,7 +77,11 @@ var towerController = {
                 return a.hits / a.hitsMax - b.hits / b.hitsMax;
             });
 
-            tower.repair(repairTargets[0]);
+            repairTarget = repairTargets[0];
+            Memory.tower[tower.id].repairObjectId = repairTarget.id;
+            Memory.tower[tower.id].repairObjectTime = Game.time;
+
+            tower.repair(repairTarget);
         });
 
         return true;
