@@ -117,8 +117,8 @@ var creepHandler = {
         if (this.creationPossible(spawn)) {
             var creationEnergy = this.getCreationEnergy(spawn),
                 constructionPlan = globalBuildPattern[role],
-                buildPattern = constructionPlan.pattern,
-                buildOrder = constructionPlan.extensionOrder,
+                buildPattern = constructionPlan.pattern.slice(0),
+                buildOrder = constructionPlan.extensionOrder.slice(0),
                 diff = creationEnergy - defaultCreationEnergy;
 
             console.log('creationEnergy: ' + creationEnergy);
