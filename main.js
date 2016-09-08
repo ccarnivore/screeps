@@ -32,7 +32,7 @@ module.exports.loop = function () {
                 break;
             }
 
-            case 'harvester':
+            case 'harvester': {
                 roleHarvester.run(creep);
                 break;
             }
