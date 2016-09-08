@@ -3,7 +3,7 @@ var REPAIR_RELEVANCE = {
     'tower': 75,
     'extension': 70,
     'container': 70,
-    'rampart': 60,
+    'rampart': 61,
     'constructedWall': 60,
     'road': 10
 };
