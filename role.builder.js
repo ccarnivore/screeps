@@ -1,6 +1,47 @@
 var sourceHandler = require('main.sourceHandling');
 var roleBuilder = {
 
+    /**
+     * creeps repair routine
+     *
+     * @param creep
+     * @returns {boolean}
+     */
+    repair: function(creep) {
+        var repairTargets = creep.room.find(FIND_STRUCTURES, {
+                filter: (structure) => {return structure.hits < structure.hitsMax}
+        });
+
+        if (repairTargets.length) {
+            if (creep.repair(repairTargets[0]) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(repairTargets[0]);
+            }
+
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * creep build routine
+     *
+     * @param creep
+     * @returns {boolean}
+     */
+    build: function(creep) {
+        var buildTargets = creep.room.find(FIND_CONSTRUCTION_SITES);
+        if(buildTargets.length) {
+            if(creep.build(buildTargets[0]) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(buildTargets[0]);
+            }
+
+            return true;
+        }
+
+        return false;
+    },
+
     /** @param {Creep} creep **/
     run: function(creep) {
         if(creep.memory.working && creep.carry.energy == 0) {
@@ -13,24 +54,13 @@ var roleBuilder = {
 
         if(creep.memory.working) {
             if (creep.memory.canRepair) {
-                var repairTargets = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => {return structure.hits < structure.hitsMax}
-                });
-
-                if (repairTargets.length) {
-                    if (creep.repair(repairTargets[0]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(repairTargets[0]);
-                    }
-
+                if (this.repair(creep)) {
                     return;
                 }
             }
 
-            var buildTargets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            if(buildTargets.length) {
-                if(creep.build(buildTargets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(buildTargets[0]);
-                }
+            if (!this.build(creep)) {
+                this.repair(creep);
             }
         }
         else {
