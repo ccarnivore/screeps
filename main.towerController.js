@@ -2,6 +2,8 @@ var towerController = {
 
     /**
      * basic room defending
+     * defend until no energy given
+     *
      * @param room
      */
     defendRoom: function(room) {
@@ -13,11 +15,17 @@ var towerController = {
 
         console.log('hostile creeps spotted');
         var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
-        towers.forEach(tower => { if (tower.energy >= 50) tower.attack(hostiles[0]) });
+        towers.forEach(tower => { tower.attack(hostiles[0]) });
 
         return true;
     },
 
+    /**
+     * basic creeps healing
+     *
+     * @param room
+     * @returns {boolean}
+     */
     healCreeps: function(room) {
         var injuredCreeps = room.find(FIND_CREEPS, {filter: (creep) => { return creep.hits < creep.hitsMax }});
         if (injuredCreeps.length == 0) {
@@ -31,13 +39,26 @@ var towerController = {
         return true;
     },
 
+    /**
+     * basic structure repairing
+     *
+     * @param room
+     * @returns {boolean}
+     */
     repairStructures: function(room) {
         var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
         towers.forEach(tower => { if (tower.energy <= 50) { return };
-            var repairTargets = tower.pos.findInRange(FIND_MY_STRUCTURES, 5, {filter: (structure) => { return structure.hits < structure.hitsMax } });
+            var repairTargets = tower.pos.findInRange(
+                FIND_MY_STRUCTURES, 5, {filter: (structure) => { return structure.structureType != STRUCTURE_WALL
+                && structure.hits < structure.hitsMax }
+            });
             if (repairTargets.length == 0) {
                 return false;
             }
+
+            repairTargets.sort(function (a, b) {
+                return a.hits / a.hitsMax - b.hits / b.hitsMax;
+            });
 
             tower.repair(repairTargets[0]);
         });
