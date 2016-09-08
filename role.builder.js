@@ -123,17 +123,23 @@ var roleBuilder = {
         }
         else {
             var container = sourceHandler.findContainer(creep);
-            if (container != undefined) {
-                if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(container);
-                }
 
-                return;
+            var source = sourceHandler.findSource(creep);
+            var sourceRange = creep.pos.getRangeTo(source);
+
+            if (container != undefined) {
+                var containerRange = creep.pos.getRangeTo(container);
+                if (containerRange <= sourceRange) {
+                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(container);
+                    }
+
+                    return;
+                }
             }
 
-            var mySource = sourceHandler.findSource(creep);
-            if(creep.harvest(mySource) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(mySource);
+            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(source);
             }
         }
     }

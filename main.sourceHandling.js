@@ -68,7 +68,9 @@ var sourceHandler = {
     findContainer: function(creep) {
         var mySource = this.findSource(creep);
         var containerCollection = creep.room.find(
-            FIND_STRUCTURES, { filter: (structure) => { return (structure.structureType == STRUCTURE_CONTAINER ); }
+            FIND_STRUCTURES, { filter: (structure) => { return (structure.structureType == STRUCTURE_CONTAINER &&
+                structure.store[RESOURCE_ENERGY] > 50);
+            }
         });
 
         var target = undefined;
@@ -76,10 +78,6 @@ var sourceHandler = {
         if (containerCollection.length) {
             for (var i = 0; i < containerCollection.length; i++) {
                 var container = containerCollection[i];
-                if (container.store[RESOURCE_ENERGY] < 50) {
-                    continue;
-                }
-
                 var range = creep.pos.getRangeTo(container);
                 if (closest == undefined || range < closest) {
                     target = container;
@@ -99,6 +97,8 @@ var sourceHandler = {
 
         return target;
     }
+
+
 
 }
 
