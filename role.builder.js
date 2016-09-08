@@ -44,6 +44,7 @@ var roleBuilder = {
             filter: (structure) => {return structure.hits < structure.hitsMax}
         });
 
+
         if (repairTargets.length) {
             repairTargets.sort(function(a, b) {
                 var valASource = a.hits,
