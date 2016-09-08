@@ -8,6 +8,8 @@ var REPAIR_RELEVANCE = {
     'road': 10
 };
 
+var minHitsFactor = 2;
+
 var sourceHandler = require('main.sourceHandling');
 var roleBuilder = {
 
@@ -52,8 +54,8 @@ var roleBuilder = {
                     valBBase = b.hitsMax,
                     factorA = REPAIR_RELEVANCE[a.type],
                     factorB = REPAIR_RELEVANCE[b.type],
-                    minA = valASource / (valABase / 4),
-                    minB = valBSource / (valBBase / 4);
+                    minA = valASource / (valABase / minHitsFactor),
+                    minB = valBSource / (valBBase / minHitsFactor);
 
                 if (minA < 0.5 && minB < 0.5) {
                     if (a.type == b.type) {
