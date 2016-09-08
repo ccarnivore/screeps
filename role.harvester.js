@@ -11,9 +11,17 @@ var roleHarvester = {
     /** @param {Creep} creep **/
     run: function(creep) {
         if(creep.carry.energy < creep.carryCapacity) {
-            var mySource = sourceHandler.findSource(creep);
-            if(creep.harvest(mySource) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(mySource);
+            var droppedEnergyCollection = creep.pos.findInRange(FIND_DROPPED_ENERGY, 5);
+            if (droppedEnergyCollection.length) {
+                if (creep.pickup(droppedEnergyCollection[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(droppedEnergyCollection[0]);
+                }
+
+            } else {
+                var mySource = sourceHandler.findSource(creep);
+                if(creep.harvest(mySource) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(mySource);
+                }
             }
         }
         else {
