@@ -1,3 +1,10 @@
+var ENERGY_RELEVANCE = [
+    { 'spawn': 100 },
+    { 'tower': 75 },
+    { 'extension': 75 },
+    { 'container': 70 }
+];
+
 var sourceHandler = require('main.sourceHandling');
 var roleHarvester = {
 
@@ -16,6 +23,10 @@ var roleHarvester = {
                     (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity) ||
                     (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity)
                 }
+            });
+
+            targets.sort(function(a, b) {
+                console.log(a, b);
             });
 
             if(targets.length > 0) {

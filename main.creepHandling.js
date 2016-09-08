@@ -13,12 +13,6 @@ var creepLimit = 10;
 var defaultCreationEnergy = 200;
 var minEnergyChunk = 50;
 
-var bodyCost = {
-    'work': 100,
-    'carry': 50,
-    'move': 50,
-};
-
 var globalBuildPattern = {
     harvester: {
         pattern: [WORK, CARRY, MOVE],
@@ -132,7 +126,7 @@ var creepHandler = {
                     }
 
                     part = buildOrder[i];
-                    cost = bodyCost[part];
+                    cost = BODYPART_COST[part];
 
                     if (diff - cost >= 0) {
                         buildPattern.push(part);

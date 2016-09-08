@@ -1,3 +1,13 @@
+var REPAIR_RELEVANCE = [
+    { 'spawn': 100 },
+    { 'road': 10 },
+    { 'tower': 75 },
+    { 'rampart': 60 },
+    { 'constructedWall': 60 },
+    { 'extension': 70 },
+    { 'container': 70 }
+];
+
 var sourceHandler = require('main.sourceHandling');
 var roleBuilder = {
 
