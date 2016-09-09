@@ -1,8 +1,6 @@
-var ENERGY_RELEVANCE = {
-    'spawn': 100,
-    'tower': 75,
-    'extension': 80,
-    'container': 70
+var REFILL_RELEVANCE_HARVESTER = {
+    'spawn': 3000,
+    'container': 100
 };
 
 var sourceHandler = require('main.sourceHandling');
@@ -13,32 +11,32 @@ var roleHarvester = {
         creep.memory.work = creep.memory.work || 'harvesting';
 
         if (creep.memory.work == 'transfering') {
-            var targets = creep.room.find(FIND_STRUCTURES, {filter: (structure) => {return (structure.structureType == STRUCTURE_TOWER
-                    && structure.energy < structure.energyCapacity) ||
-                    (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity) ||
-                    (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity) ||
-                    (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity)
-                }
+            var targets = creep.room.find(FIND_STRUCTURES, {filter: (structure) => { return (
+                    structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity
+                ) || (
+                    structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity
+                )}
             });
 
             if (targets.length > 0) {
                 targets.sort(function (a, b) {
-                    var relevanceA = ENERGY_RELEVANCE[a.structureType],
-                        relevanceB = ENERGY_RELEVANCE[b.structureType];
+                    var refillRelevanceA = REFILL_RELEVANCE_HARVESTER[a.structureType],
+                        refillRelevanceB = REFILL_RELEVANCE_HARVESTER[b.structureType];
 
-                    if (Memory.invaderSpotted === true) {
-                        if (a.structureType == STRUCTURE_TOWER) {
-                            relevanceA += 1000;
-                        }
-                        if (b.structureType == STRUCTURE_TOWER) {
-                            relevanceB += 1000;
-                        }
+                    if (a.structureType == STRUCTURE_CONTAINER) {
+                        refillRelevanceA += a.store[RESOURCE_ENERGY]
+                    } else {
+                        refillRelevanceA += a.energy;
                     }
 
-                    return relevanceB - relevanceA;
-                });
+                    if (b.structureType == STRUCTURE_CONTAINER) {
+                        refillRelevanceA += b.store[RESOURCE_ENERGY]
+                    } else {
+                        refillRelevanceA += b.energy;
+                    }
 
-                var target = targets[0];
+                    return refillRelevanceA - refillRelevanceB;
+                });
 
                 switch(creep.transfer(targets[0], RESOURCE_ENERGY)) {
                     case ERR_NOT_IN_RANGE: {
@@ -57,12 +55,6 @@ var roleHarvester = {
                 } else {
                     creep.say('resting');
                 }
-
-                /*creep.say('morph');
-                 creep.memory.formerRole = 'harvester';
-                 creep.memory.role = 'builder';
-                 creep.memory.canRepair = true;
-                 return;*/
             }
         }
 

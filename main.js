@@ -1,4 +1,5 @@
 var roleHarvester = require('role.harvester');
+var roleDistributor = require('role.distributor');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var sourceHandler = require('main.sourceHandling');
@@ -37,6 +38,11 @@ module.exports.loop = function () {
 
             case 'harvester': {
                 roleHarvester.run(creep);
+                break;
+            }
+
+            case 'distributor': {
+                roleDistributor.run(creep);
                 break;
             }
 

@@ -68,6 +68,10 @@ var sourceHandler = {
             return this._getEnergy(creep, RESOURCE_ENERGY, energySource);
         }
 
+        if (creep.memory.role == 'distributor') {
+            return this._getEnergy(creep, STRUCTURE_CONTAINER, sourceHandler.findContainer(creep));
+        }
+
         energySource = sourceHandler.findSource(creep);
         if (creep.memory.role != 'harvester') {
             var container;
@@ -123,8 +127,6 @@ var sourceHandler = {
         }
 
         var lastAssigned = Memory.lastAssignedSourceId, chosenSource;
-        creep.say('searching...');
-
         if (Memory.sourceDict.length > 1) {
             if (lastAssigned) {
                 for (var currentSource in Memory.sourceDict) {

@@ -10,6 +10,17 @@ var minEnergyChunk = 50;
 var minCreepEnergyLevel = 200;
 
 var globalBuildPattern = {
+    distributor: {
+        extensionOrder: [CARRY, CARRY, CARRY, MOVE],
+        level1: {
+            pattern: [CARRY, CARRY, MOVE, MOVE],
+            cost: 200
+        },
+        level2: {
+            pattern: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
+            cost: 300
+        },
+    },
     harvester: {
         extensionOrder: [CARRY, CARRY, WORK, MOVE],
         level1: {
@@ -49,12 +60,14 @@ var limitation = {
     level1: {
         harvester: 2,
         builder: 1,
-        upgrader: 1
+        upgrader: 1,
+        distributor: 2,
     },
     level2: {
         harvester: 4,
         builder: 3,
-        upgrader: 3
+        upgrader: 3,
+        distributor: 4,
     },
 };
 
@@ -89,8 +102,8 @@ var creepHandler = {
         this.checkLevel(spawn);
 
         var creepCount = 0;
-        var creation = { harvester: 0, upgrader: 0, builder: 0 };
-        var hasUpgrader = false;
+        var creation = { harvester: 0, upgrader: 0, builder: 0, distributor: 0 };
+        var hasUpgrader = false, hasBuilder = false;
 
         for (var creepName in Game.creeps) {
             creepCount ++;
@@ -104,6 +117,10 @@ var creepHandler = {
             if (creep.memory.role == 'upgrader') {
                 hasUpgrader = true;
             }
+
+            if (creep.memory.role == 'builder') {
+                hasBuilder = true;
+            }
         }
 
         if (!this.creationPossible(spawn)) {
@@ -112,6 +129,11 @@ var creepHandler = {
 
         if (creepCount == 0) {
             this.createCreep(spawn, 'harvester');
+            return;
+        }
+
+        if (!hasBuilder) {
+            this.createCreep(spawn, 'builder');
             return;
         }
 
