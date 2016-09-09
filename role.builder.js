@@ -97,10 +97,10 @@ var roleBuilder = {
      * @returns {boolean}
      */
     build: function(creep) {
-        var buildTargets = creep.room.find(FIND_CONSTRUCTION_SITES);
-        if(buildTargets.length) {
-            if(creep.build(buildTargets[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(buildTargets[0]);
+        var buildTarget;
+        if (buildTarget = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES)) {
+            if(creep.build(buildTarget) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(buildTarget);
             }
 
             return true;
