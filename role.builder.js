@@ -30,6 +30,11 @@ var roleBuilder = {
      * @returns {boolean}
      */
     repair: function(creep) {
+        // disable repairing in first level
+        if (Memory.currentLevel == 'level1') {
+            return false;
+        }
+
         if (creep.memory.repairTargetId) {
             if (creep.memory.repairTargetTime && ((Game.time - creep.memory.repairTargetTime) < 50)) {
                 var target = Game.getObjectById(creep.memory.repairTargetId);
