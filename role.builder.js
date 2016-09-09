@@ -24,7 +24,7 @@ var roleBuilder = {
      */
     repair: function(creep) {
         // disable repairing in first level
-        if (Memory.currentLevel <= c.LEVEL2) {
+        if (Memory.currentLevel == c.LEVEL1) {
             return false;
         }
 
