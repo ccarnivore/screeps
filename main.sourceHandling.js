@@ -1,3 +1,4 @@
+var c = require('main.const');
 var sourceHandler = {
 
     globalLookUp: function(spawn) {
@@ -68,12 +69,12 @@ var sourceHandler = {
             return this._getEnergy(creep, RESOURCE_ENERGY, energySource);
         }
 
-        if (creep.memory.role == 'distributor') {
+        if (creep.memory.role == c.CREEP_ROLE_DISTRIBUTOR) {
             return this._getEnergy(creep, STRUCTURE_CONTAINER, sourceHandler.findContainer(creep));
         }
 
         energySource = sourceHandler.findSource(creep);
-        if (creep.memory.role != 'harvester') {
+        if (creep.memory.role != c.CREEP_ROLE_HARVESTER) {
             var container;
             if (container = sourceHandler.findContainer(creep)) {
                 var containerRange = creep.pos.getRangeTo(container);

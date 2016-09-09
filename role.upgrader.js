@@ -1,3 +1,4 @@
+var c = require('main.const');
 var sourceHandler = require('main.sourceHandling');
 var roleUpgrader = {
 
@@ -6,9 +7,9 @@ var roleUpgrader = {
      * @param creep
      */
     run: function(creep) {
-        creep.memory.work = creep.memory.work || 'harvesting';
+        creep.memory.work = creep.memory.work || c.CREEP_WORK_HARVESTING;
 
-        if (creep.memory.work == 'upgrading') {
+        if (creep.memory.work == c.CREEP_WORK_UPGRADING) {
             var res = creep.upgradeController(creep.room.controller);
             switch (res) {
                 case ERR_NOT_IN_RANGE: {
@@ -16,23 +17,23 @@ var roleUpgrader = {
                     return;
                 }
                 case ERR_NOT_ENOUGH_ENERGY: {
-                    creep.memory.work = 'harvesting';
+                    creep.memory.work = c.CREEP_WORK_HARVESTING;
                     break;
                 }
                 default: return;
             }
         }
 
-        if (creep.memory.work == 'harvesting') {
+        if (creep.memory.work == c.CREEP_WORK_HARVESTING) {
             switch (sourceHandler.getEnergy(creep)) {
                 case ERR_FULL: {
-                    creep.memory.work = 'upgrading';
+                    creep.memory.work = c.CREEP_WORK_UPGRADING;
                     return;
                 }
             }
 
             if (creep.carry.energy == creep.carryCapacity) {
-                creep.memory.work = 'upgrading';
+                creep.memory.work = c.CREEP_WORK_UPGRADING;
             }
         }
     }

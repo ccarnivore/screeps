@@ -1,3 +1,5 @@
+var c = require('main.const');
+
 var roleHarvester = require('role.harvester');
 var roleDistributor = require('role.distributor');
 var roleUpgrader = require('role.upgrader');
@@ -5,10 +7,8 @@ var roleBuilder = require('role.builder');
 var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
 var towerController = require('main.towerController');
-var x = require('main.const');
 
 module.exports.loop = function () {
-    console.log(x.FOO);
     var spawn = Game.spawns['Spawn1'];
     if (!spawn) {
         return;
@@ -28,22 +28,22 @@ module.exports.loop = function () {
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
         switch(creep.memory.role) {
-            case 'builder': {
+            case c.CREEP_ROLE_BUILDER: {
                 roleBuilder.run(creep);
                 break;
             }
             
-            case 'upgrader': {
+            case c.CREEP_ROLE_UPGRADER: {
                 roleUpgrader.run(creep);
                 break;
             }
 
-            case 'harvester': {
+            case c.CREEP_ROLE_HARVESTER: {
                 roleHarvester.run(creep);
                 break;
             }
 
-            case 'distributor': {
+            case c.CREEP_ROLE_DISTRIBUTOR: {
                 roleDistributor.run(creep);
                 break;
             }

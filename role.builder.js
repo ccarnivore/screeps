@@ -1,14 +1,7 @@
-var REPAIR_RELEVANCE = {
-    'spawn': 100,
-    'tower': 90,
-    'rampart': 80,
-    'extension': 70,
-    'container': 70,
-    'constructedWall': 10,
-    'road': 50
-};
+var c = require('main.const');
 
 var sourceHandler = require('main.sourceHandling');
+
 var roleBuilder = {
 
     _repair: function(creep, target, newTarget) {
@@ -31,7 +24,7 @@ var roleBuilder = {
      */
     repair: function(creep) {
         // disable repairing in first level
-        if (Memory.currentLevel <= 'level2') {
+        if (Memory.currentLevel <= c.LEVEL2) {
             return false;
         }
 

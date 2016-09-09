@@ -1,76 +1,4 @@
-var level1 = 'level1',
-    level2 = 'level2';
-
-var levelDefinition = {
-    level1: { minEnergy: 0 }, level2: { minEnergy: 400 }
-};
-
-var creepLimit = 4;
-var minEnergyChunk = 50;
-var minCreepEnergyLevel = 200;
-
-var globalBuildPattern = {
-    distributor: {
-        extensionOrder: [CARRY, CARRY, CARRY, MOVE],
-        level1: {
-            pattern: [CARRY, CARRY, MOVE, MOVE],
-            cost: 200
-        },
-        level2: {
-            pattern: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
-            cost: 300
-        },
-    },
-    harvester: {
-        extensionOrder: [CARRY, CARRY, WORK, MOVE],
-        level1: {
-            pattern: [WORK, CARRY, MOVE],
-            cost: 200
-        },
-        level2: {
-            pattern: [WORK, CARRY, MOVE],
-            cost: 200
-        },
-    },
-    upgrader: {
-        extensionOrder: [WORK, CARRY, WORK, CARRY, MOVE],
-        level1: {
-            pattern: [WORK, CARRY, MOVE],
-            cost: 200
-        },
-        level2: {
-            pattern: [WORK, WORK, CARRY, CARRY, MOVE],
-            cost: 350
-        }
-    },
-    builder: {
-        extensionOrder: [WORK, CARRY, WORK, CARRY, MOVE],
-        level1: {
-            pattern: [WORK, CARRY, MOVE],
-            cost: 200
-        },
-        level2: {
-            pattern: [WORK, WORK, CARRY, CARRY, MOVE],
-            cost: 350
-        }
-    }
-};
-
-var limitation = {
-    level1: {
-        harvester: 2,
-        builder: 1,
-        upgrader: 1,
-        distributor: 2,
-    },
-    level2: {
-        harvester: 4,
-        builder: 3,
-        upgrader: 3,
-        distributor: 4,
-    },
-};
-
+var c = require('main.const');
 var creepHandler = {
 
     /**
@@ -98,7 +26,7 @@ var creepHandler = {
      * @param spawn
      */
     checkCreepPopulation: function(spawn) {
-        Memory.currentLevel = Memory.currentLevel || level1;
+        Memory.currentLevel = Memory.currentLevel || c.LEVEL1;
         this.checkLevel(spawn);
 
         var creepCount = 0;
@@ -110,15 +38,15 @@ var creepHandler = {
             var creep = Game.creeps[creepName];
 
             if (!creep) {
-                wipeDead(creepName);
+                this.wipeDead(creepName);
             }
 
             creation[creep.memory.role] += 1;
-            if (creep.memory.role == 'upgrader') {
+            if (creep.memory.role == c.CREEP_ROLE_UPGRADER) {
                 hasUpgrader = true;
             }
 
-            if (creep.memory.role == 'builder') {
+            if (creep.memory.role == c.CREEP_ROLE_BUILDER) {
                 hasBuilder = true;
             }
         }
@@ -128,26 +56,27 @@ var creepHandler = {
         }
 
         if (creepCount == 0) {
-            this.createCreep(spawn, 'harvester');
+            this.createCreep(spawn, c.CREEP_ROLE_HARVESTER);
             return;
         }
 
         if (!hasBuilder) {
-            this.createCreep(spawn, 'builder');
+            this.createCreep(spawn, c.CREEP_ROLE_BUILDER);
             return;
         }
 
         if (!hasUpgrader) {
-            this.createCreep(spawn, 'upgrader');
+            this.createCreep(spawn, c.CREEP_ROLE_UPGRADER);
             return;
         }
 
-        if (creepCount >= creepLimit) {
+        var levelDefinition = c.LEVEL_DEFINITION[Memory.currentLevel];
+        if (creepCount >= c.GLOBAL_CREEP_LIMIT || creepCount >= levelDefinition.creepLimit) {
             return;
         }
 
-        for (var role in limitation[Memory.currentLevel]) {
-            if (creation[role] < limitation[Memory.currentLevel][role]) {
+        for (var role in levelDefinition.creepInstances) {
+            if (creation[role] < levelDefinition.creepInstances[role]) {
                 this.createCreep(spawn, role);
                 return;
             }
@@ -162,12 +91,12 @@ var creepHandler = {
      */
     checkLevel: function(spawn) {
         var energy = this.getCreationEnergy(spawn);
-        for (var level in levelDefinition) {
+        for (var level in c.LEVEL_DEFINITION) {
             if (level <= Memory.currentLevel) {
                 continue;
             }
 
-            if (energy >= levelDefinition[level].minEnergy) {
+            if (energy >= c.LEVEL_DEFINITION[level].minEnergy) {
                 console.log('upgrading level to ' + level);
                 Memory.currentLevel = level;
             }
@@ -184,18 +113,18 @@ var creepHandler = {
         console.log('try create ' + role);
         if (this.creationPossible(spawn, role)) {
             var creationEnergy = this.getCreationEnergy(spawn),
-                generalGonstructionPlan = globalBuildPattern[role],
-                levelConstructionPlan = globalBuildPattern[role][Memory.currentLevel],
+                generalConstructionPlan = c.GLOBAL_BUILD_PATTERN[role],
+                levelConstructionPlan = c.GLOBAL_BUILD_PATTERN[role][Memory.currentLevel],
                 buildPattern = levelConstructionPlan.pattern.slice(0),
-                extensionOrder = generalGonstructionPlan.extensionOrder.slice(0),
+                extensionOrder = generalConstructionPlan.extensionOrder.slice(0),
                 diff = creationEnergy - levelConstructionPlan.cost;
 
             console.log('creationEnergy: ' + creationEnergy);
             console.log('buildPattern before: ' + JSON.stringify(buildPattern));
 
-            if (diff >= minEnergyChunk) {
+            if (diff >= c.MIN_ENERGY_CHUNK) {
                 var i = 0, part, cost;
-                while (diff >= minEnergyChunk) {
+                while (diff >= c.MIN_ENERGY_CHUNK) {
                     if (i == extensionOrder.length) {
                         i = 0;
                     }
@@ -216,8 +145,10 @@ var creepHandler = {
 
             console.log('buildPattern after: ' + JSON.stringify(buildPattern));
             var creepArgs = {role: role, canRepair: false};
-            if (role == 'builder') { Memory.isRepairBuilder = !Memory.isRepairBuilder; }
             creepArgs.canRepair = Memory.isRepairBuilder;
+            if (role == c.CREEP_ROLE_BUILDER) {
+                Memory.isRepairBuilder = !Memory.isRepairBuilder;
+            }
 
             spawn.createCreep(buildPattern, null, creepArgs);
         } else {
@@ -235,10 +166,10 @@ var creepHandler = {
     creationPossible: function(spawn, role) {
         var energy = this.getCreationEnergy(spawn);
         if (role == undefined) {
-            return energy >= minCreepEnergyLevel;
+            return energy >= c.MIN_CREEP_ENERGY_LEVEL;
         }
 
-        return this.getCreationEnergy(spawn) >= globalBuildPattern[role][Memory.currentLevel].cost;
+        return this.getCreationEnergy(spawn) >= c.GLOBAL_BUILD_PATTERN[role][Memory.currentLevel].cost;
     },
 
     /**
@@ -259,7 +190,6 @@ var creepHandler = {
         return energy;
     }
 
-    
 }
 
 module.exports = creepHandler;

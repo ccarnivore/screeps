@@ -1,3 +1,4 @@
+var c = require('main.const');
 var towerController = {
 
     /**
