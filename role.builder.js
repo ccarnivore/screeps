@@ -49,12 +49,12 @@ var roleBuilder = {
             filter: (structure) => { return (structure.structureType != STRUCTURE_ROAD
                 && structure.structureType != STRUCTURE_WALL
                 && structure.hits < structure.hitsMax
-            ) || (
-                structure.structureType == STRUCTURE_ROAD && structure.hits < (structure.hitsMax / 2)
-            ) || (
-                structure.structureType == STRUCTURE_WALL && structure.hits < (structure.hitsMax / 3000)
-            )
-             }
+                ) || (
+                    structure.structureType == STRUCTURE_ROAD && structure.hits < (structure.hitsMax / 2)
+                ) || (
+                    structure.structureType == STRUCTURE_WALL && structure.hits < (structure.hitsMax / 3000)
+                )
+            }
         });
 
 
@@ -141,29 +141,7 @@ var roleBuilder = {
             }
         }
         else {
-            var container = sourceHandler.findContainer(creep);
-
-            var source = sourceHandler.findSource(creep);
-            var sourceRange = creep.pos.getRangeTo(source);
-
-            if (container != undefined) {
-                var containerRange = creep.pos.getRangeTo(container);
-
-                if (containerRange <= sourceRange) {
-                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(container);
-                    }
-
-                    return;
-                }
-            }
-
-            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
-                if (creep.pos.lookFor(LOOK_TERRAIN) == 'swamp') {
-                    creep.pos.createConstructionSite(STRUCTURE_ROAD);
-                }
-            }
+            sourceHandler.getEnergy(creep);
         }
     }
 };

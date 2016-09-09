@@ -10,34 +10,19 @@ var roleHarvester = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        if(creep.carry.energy < creep.carryCapacity) {
-            var droppedEnergyCollection = creep.pos.findInRange(FIND_DROPPED_ENERGY, 1);
-            if (droppedEnergyCollection.length) {
-                if (creep.pickup(droppedEnergyCollection[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(droppedEnergyCollection[0]);
-                }
+        creep.memory.work = creep.memory.work || 'harvesting';
 
-            } else {
-                var mySource = sourceHandler.findSource(creep);
-                if(creep.harvest(mySource) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(mySource);
-                    if (creep.pos.lookFor(LOOK_TERRAIN) == 'swamp') {
-                        creep.pos.createConstructionSite(STRUCTURE_ROAD);
-                    }
-                }
-            }
-        }
-        else {
-            var targets = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => { return (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity) ||
+        if (creep.memory.work == 'transfering') {
+            var targets = creep.room.find(FIND_STRUCTURES, {filter: (structure) => {return (structure.structureType == STRUCTURE_TOWER
+                    && structure.energy < structure.energyCapacity) ||
                     (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity) ||
                     (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity) ||
                     (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity)
                 }
             });
 
-            if(targets.length > 0) {
-                targets.sort(function(a, b) {
+            if (targets.length > 0) {
+                targets.sort(function (a, b) {
                     var relevanceA = ENERGY_RELEVANCE[a.structureType],
                         relevanceB = ENERGY_RELEVANCE[b.structureType];
 
@@ -52,16 +37,50 @@ var roleHarvester = {
 
                     return relevanceB - relevanceA;
                 });
-                if(creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0]);
-                }
-            } else {
-                // nothing to do.. change role
-                creep.say('morph');
-                creep.memory.role = 'builder';
-                creep.memory.canRepair = true;
-                return;
 
+                var target = targets[0];
+
+                switch(creep.transfer(targets[0], RESOURCE_ENERGY)) {
+                    case ERR_NOT_IN_RANGE: {
+                        creep.moveTo(targets[0]);
+                        break;
+                    }
+                    case ERR_NOT_ENOUGH_RESOURCES: {
+                        creep.memory.work = 'harvesting';
+                        break;
+                    }
+                }
+
+            } else {
+                if (creep.carry.energy < creep.carryCapacity) {
+                    creep.memory.work = 'harvesting';
+                } else {
+                    creep.say('resting');
+                }
+
+                /*creep.say('morph');
+                 creep.memory.formerRole = 'harvester';
+                 creep.memory.role = 'builder';
+                 creep.memory.canRepair = true;
+                 return;*/
+            }
+        }
+
+        if (creep.memory.work == 'harvesting') {
+            switch (sourceHandler.getEnergy(creep)) {
+                case ERR_FULL: {
+                    creep.memory.work = 'transfering';
+                    return;
+                }
+                case ERR_NOT_ENOUGH_RESOURCES: {
+                    if (creep.carry.energy > 0) {
+                        creep.memory.work = 'transfering';
+                    }
+                }
+            }
+
+            if (creep.carry.energy == creep.carryCapacity) {
+                creep.memory.work = 'transfering';
             }
         }
     }
