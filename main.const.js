@@ -42,6 +42,9 @@ module.exports = {
                 builder: 1,
                 upgrader: 1,
                 distributor: 1
+            },
+            maxRepairFactor: {
+                // repair disabled in level 1
             }
         },
         LEVEL2: {
@@ -52,6 +55,11 @@ module.exports = {
                 builder: 3,
                 upgrader: 3,
                 distributor: 4
+            },
+            maxRepairFactor: {
+                'wall': 300,
+                'rampart': 30,
+                'road': 4
             }
         }
     },

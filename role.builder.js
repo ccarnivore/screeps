@@ -41,11 +41,17 @@ var roleBuilder = {
         var repairTargets = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => { return (structure.structureType != STRUCTURE_ROAD
                 && structure.structureType != STRUCTURE_WALL
+                && structure.structureType != STRUCTURE_RAMPART
                 && structure.hits < structure.hitsMax
                 ) || (
-                    structure.structureType == STRUCTURE_ROAD && structure.hits < (structure.hitsMax / 2)
+                    structure.structureType == STRUCTURE_ROAD
+                    && structure.hits < (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_ROAD])
                 ) || (
-                    structure.structureType == STRUCTURE_WALL && structure.hits < (structure.hitsMax / 3000)
+                    structure.structureType == STRUCTURE_WALL
+                    && structure.hits < (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_WALL])
+                ) || (
+                    structure.structureType == STRUCTURE_RAMPART
+                    && structure.hits < (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_RAMPART])
                 )
             }
         });
