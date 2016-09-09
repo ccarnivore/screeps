@@ -50,7 +50,7 @@ var roleHarvester = {
                 if (creep.carry.energy < creep.carryCapacity) {
                     creep.memory.work = c.CREEP_WORK_HARVESTING;
                 } else {
-                    creep.say('resting');
+                    console.log(creep, ' is resting due to no work');
                 }
             }
         }
