@@ -76,7 +76,7 @@ var sourceHandler = {
                 return ERR_INVALID_ARGS;
             }
 
-            creep.usedEnergyContainer = usedContainer.id;
+            creep.memory.usedEnergyContainer = usedContainer.id;
             return this._getEnergy(creep, STRUCTURE_CONTAINER, usedContainer);
         }
 
