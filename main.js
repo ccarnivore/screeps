@@ -7,6 +7,9 @@ var towerController = require('main.towerController');
 
 module.exports.loop = function () {
     var spawn = Game.spawns['Spawn1'];
+    if (!spawn) {
+        return;
+    }
 
     sourceHandler.globalLookUp(spawn);
     
