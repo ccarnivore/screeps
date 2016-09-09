@@ -17,7 +17,7 @@ var roleDistributor = {
                 }
             });
 
-            if (targets.length > 0 && targets[0].id != creep.memory.usedEnergyContainer) {
+            if (targets.length > 0) {
                 targets.sort(function (a, b) {
                     var relevanceA = c.DISTRIBUTION_ENERGY_RELEVANCE[a.structureType],
                         relevanceB = c.DISTRIBUTION_ENERGY_RELEVANCE[b.structureType];
@@ -46,14 +46,26 @@ var roleDistributor = {
                     return relevanceB - relevanceA;
                 });
 
-                switch(creep.transfer(targets[0], RESOURCE_ENERGY)) {
-                    case ERR_NOT_IN_RANGE: {
-                        creep.moveTo(targets[0]);
-                        break;
+                var target;
+                for (var currentTarget in targets) {
+                    if (targets[currentTarget].id == creep.memory.usedEnergyContainer) {
+                        continue;
                     }
-                    case ERR_NOT_ENOUGH_RESOURCES: {
-                        creep.memory.work = c.CREEP_WORK_HARVESTING;
-                        break;
+
+                    target = targets[currentTarget];
+                    break;
+                }
+
+                if (target) {
+                    switch(creep.transfer(target, RESOURCE_ENERGY)) {
+                        case ERR_NOT_IN_RANGE: {
+                            creep.moveTo(target);
+                            break;
+                        }
+                        case ERR_NOT_ENOUGH_RESOURCES: {
+                            creep.memory.work = c.CREEP_WORK_HARVESTING;
+                            break;
+                        }
                     }
                 }
 
