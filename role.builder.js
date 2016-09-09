@@ -155,6 +155,9 @@ var roleBuilder = {
 
             if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(source);
+                if (creep.pos.lookFor(LOOK_TERRAIN) == 'swamp') {
+                    creep.pos.createConstructionSite(STRUCTURE_ROAD);
+                }
             }
         }
     }
