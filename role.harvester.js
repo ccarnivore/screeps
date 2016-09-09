@@ -50,7 +50,14 @@ var roleHarvester = {
                 if (creep.carry.energy < creep.carryCapacity) {
                     creep.memory.work = c.CREEP_WORK_HARVESTING;
                 } else {
-                    console.log(creep, ' is resting due to no work');
+                    // morphing to worker drone
+                    creep.say('morphing!');
+                    if (!creep.memory.formerRole) {
+                        creep.memory.formerRole = c.CREEP_ROLE_HARVESTER;
+                    }
+
+                    creep.memory.role = c.CREEP_ROLE_BUILDER;
+                    creep.memory.canRepair = true;
                 }
             }
         }
