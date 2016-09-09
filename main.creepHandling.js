@@ -94,6 +94,9 @@ var creepHandler = {
      * @param spawn
      */
     checkCreepPopulation: function(spawn) {
+        Memory.currentLevel = Memory.currentLevel || level1;
+        this.checkLevel(spawn);
+
         var creepCount = 0;
         var creation = { harvester: 0, upgrader: 0, builder: 0 };
         var hasUpgrader = false;
@@ -166,9 +169,6 @@ var creepHandler = {
      * @param role
      */
     createCreep: function(spawn, role) {
-        Memory.currentLevel = Memory.currentLevel || level1;
-        this.checkLevel(spawn);
-
         console.log('try create ' + role);
         if (this.creationPossible(spawn, role)) {
             var creationEnergy = this.getCreationEnergy(spawn),
