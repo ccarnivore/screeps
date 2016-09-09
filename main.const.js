@@ -41,7 +41,7 @@ module.exports = {
                 harvester: 2,
                 builder: 1,
                 upgrader: 1,
-                distributor: 0
+                distributor: 1
             }
         },
         LEVEL2: {
@@ -74,12 +74,12 @@ module.exports = {
         harvester: {
             extensionOrder: [CARRY, CARRY, WORK, MOVE],
             LEVEL1: {
-                pattern: [WORK, CARRY, MOVE],
-                cost: 200
+                pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 300
             },
             LEVEL2: {
-                pattern: [WORK, CARRY, MOVE],
-                cost: 200
+                pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 300
             },
         },
         upgrader: {
