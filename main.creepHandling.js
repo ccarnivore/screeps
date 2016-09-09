@@ -14,7 +14,7 @@ var levelDefinition = {
     level1: { minEnergy: 0 }, level2: { minEnergy: 400 }
 };
 
-var creepLimit = 5;
+var creepLimit = 10;
 var minEnergyChunk = 50;
 var minCreepEnergyLevel = 200;
 
@@ -62,8 +62,8 @@ var limitation = {
     },
     level2: {
         harvester: 4,
-        builder: 6,
-        upgrader: 4
+        builder: 3,
+        upgrader: 3
     },
 };
 
@@ -154,7 +154,7 @@ var creepHandler = {
                 continue;
             }
 
-            if (energy >= level.minEnergy) {
+            if (energy >= levelDefinition[level].minEnergy) {
                 console.log('upgrading level to ' + level);
                 Memory.currentLevel = level;
             }
