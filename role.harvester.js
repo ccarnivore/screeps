@@ -15,6 +15,10 @@ var roleHarvester = {
             if (droppedEnergyCollection.length) {
                 if (creep.pickup(droppedEnergyCollection[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(droppedEnergyCollection[0]);
+                    console.log(creep.pos.lookFor(LOOK_TERRAIN));
+                    if (creep.pos.lookFor(LOOK_TERRAIN) == 'swamp') {
+                        creep.pos.createConstructionSite(STRUCTURE_ROAD);
+                    }
                 }
 
             } else {
