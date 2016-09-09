@@ -46,7 +46,7 @@ module.exports = {
         },
         LEVEL2: {
             minEnergy: 400,
-            creepLimit: 10,
+            creepLimit: 14,
             creepInstances: {
                 harvester: 4,
                 builder: 3,
