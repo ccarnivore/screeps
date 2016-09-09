@@ -5,10 +5,10 @@ var roleBuilder = require('role.builder');
 var sourceHandler = require('main.sourceHandling');
 var creepHandler = require('main.creepHandling');
 var towerController = require('main.towerController');
-require('main.const');
+var x = require('main.const');
 
 module.exports.loop = function () {
-    console.log(FOO);
+    console.log(x.FOO);
     var spawn = Game.spawns['Spawn1'];
     if (!spawn) {
         return;
