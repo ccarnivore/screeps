@@ -9,45 +9,47 @@ var creepHandler = require('main.creepHandling');
 var towerController = require('main.towerController');
 
 module.exports.loop = function () {
-    var spawn = Game.spawns['Spawn1'];
-    if (!spawn) {
-        return;
-    }
-
-    sourceHandler.globalLookUp(spawn);
-    
-    creepHandler.wipeDead();
-    creepHandler.checkCreepPopulation(spawn);
-
-    if (!towerController.defendRoom(spawn.room)) {
-        if (!towerController.healCreeps(spawn.room)) {
-            towerController.repairStructures(spawn.room);
+    for (var spawnName in Game.spawns) {
+        var spawn = Game.spawns[spawnName];
+        if (!spawn) {
+            return;
         }
-    }
 
-    for(var name in Game.creeps) {
-        var creep = Game.creeps[name];
-        switch(creep.memory.role) {
-            case c.CREEP_ROLE_BUILDER: {
-                roleBuilder.run(creep);
-                break;
-            }
-            
-            case c.CREEP_ROLE_UPGRADER: {
-                roleUpgrader.run(creep);
-                break;
-            }
+        sourceHandler.globalLookUp(spawn);
 
-            case c.CREEP_ROLE_HARVESTER: {
-                roleHarvester.run(creep);
-                break;
-            }
+        creepHandler.wipeDead();
+        creepHandler.checkCreepPopulation(spawn);
 
-            case c.CREEP_ROLE_DISTRIBUTOR: {
-                roleDistributor.run(creep);
-                break;
+        if (!towerController.defendRoom(spawn.room)) {
+            if (!towerController.healCreeps(spawn.room)) {
+                towerController.repairStructures(spawn.room);
             }
+        }
 
+        for(var name in Game.creeps) {
+            var creep = Game.creeps[name];
+            switch(creep.memory.role) {
+                case c.CREEP_ROLE_BUILDER: {
+                    roleBuilder.run(creep);
+                    break;
+                }
+
+                case c.CREEP_ROLE_UPGRADER: {
+                    roleUpgrader.run(creep);
+                    break;
+                }
+
+                case c.CREEP_ROLE_HARVESTER: {
+                    roleHarvester.run(creep);
+                    break;
+                }
+
+                case c.CREEP_ROLE_DISTRIBUTOR: {
+                    roleDistributor.run(creep);
+                    break;
+                }
+
+            }
         }
     }
 }
