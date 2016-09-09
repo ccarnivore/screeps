@@ -134,6 +134,12 @@ var roleBuilder = {
             }
         }
         else {
+            if (creep.memory.formerRole) {
+                creep.memory.role = creep.memory.formerRole;
+                delete creep.memory.formerRole;
+                return;
+            }
+
             sourceHandler.getEnergy(creep);
         }
     }
