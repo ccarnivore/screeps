@@ -139,7 +139,6 @@ var creepHandler = {
                 return;
             }
         }
-
     },
 
     /**
