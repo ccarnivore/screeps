@@ -17,7 +17,7 @@ var roleDistributor = {
                 }
             });
 
-            if (targets.length > 0) {
+            if (targets.length > 0 && targets[0].id != creep.memory.usedEnergyContainer) {
                 targets.sort(function (a, b) {
                     var relevanceA = c.DISTRIBUTION_ENERGY_RELEVANCE[a.structureType],
                         relevanceB = c.DISTRIBUTION_ENERGY_RELEVANCE[b.structureType];
@@ -83,6 +83,7 @@ var roleDistributor = {
                     if (creep.carry.energy > 0) {
                         creep.memory.work = c.CREEP_WORK_DISTRIBUTING;
                     }
+                    break;
                 }
             }
 

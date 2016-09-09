@@ -62,6 +62,7 @@ var sourceHandler = {
     /**
      * find energy
      * @param creep
+     * @return int
      */
     getEnergy: function(creep) {
         var energySource;
@@ -70,7 +71,13 @@ var sourceHandler = {
         }
 
         if (creep.memory.role == c.CREEP_ROLE_DISTRIBUTOR) {
-            return this._getEnergy(creep, STRUCTURE_CONTAINER, sourceHandler.findContainer(creep));
+            var usedContainer = sourceHandler.findContainer(creep);
+            if (!usedContainer) {
+                return ERR_INVALID_ARGS;
+            }
+
+            creep.usedEnergyContainer = usedContainer.id;
+            return this._getEnergy(creep, STRUCTURE_CONTAINER, usedContainer);
         }
 
         energySource = sourceHandler.findSource(creep);
