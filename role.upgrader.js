@@ -1,43 +1,38 @@
 var sourceHandler = require('main.sourceHandling');
 var roleUpgrader = {
 
-    /** @param {Creep} creep **/
+    /**
+     *
+     * @param creep
+     */
     run: function(creep) {
+        creep.memory.work = creep.memory.work || 'harvesting';
 
-        if(creep.memory.upgrading && creep.carry.energy == 0) {
-            creep.memory.upgrading = false;
-        }
-        if(!creep.memory.upgrading && creep.carry.energy == creep.carryCapacity) {
-            creep.memory.upgrading = true;
-        }
-
-        if(creep.memory.upgrading) {
-            if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller);
+        if (creep.memory.work == 'upgrading') {
+            var res = creep.upgradeController(creep.room.controller);
+            switch (res) {
+                case ERR_NOT_IN_RANGE: {
+                    creep.moveTo(creep.room.controller);
+                    return;
+                }
+                case ERR_NOT_ENOUGH_ENERGY: {
+                    creep.memory.work = 'harvesting';
+                    break;
+                }
+                default: return;
             }
         }
-        else {
-            var container = sourceHandler.findContainer(creep);
 
-            var source = sourceHandler.findSource(creep);
-            var sourceRange = creep.pos.getRangeTo(source);
-
-            if (container != undefined) {
-                var containerRange = creep.pos.getRangeTo(container);
-                if (containerRange <= sourceRange) {
-                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(container);
-                    }
-
+        if (creep.memory.work == 'harvesting') {
+            switch (sourceHandler.getEnergy(creep)) {
+                case ERR_FULL: {
+                    creep.memory.work = 'upgrading';
                     return;
                 }
             }
 
-            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
-                if (creep.pos.lookFor(LOOK_TERRAIN) == 'swamp') {
-                    creep.pos.createConstructionSite(STRUCTURE_ROAD);
-                }
+            if (creep.carry.energy == creep.carryCapacity) {
+                creep.memory.work = 'upgrading';
             }
         }
     }

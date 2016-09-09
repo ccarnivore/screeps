@@ -1,15 +1,13 @@
 var sourceHandler = {
-    
+
     globalLookUp: function(spawn) {
         Memory.sourceDict = Memory.sourceDict || [];
-        
         var sourceCollection = spawn.room.find(FIND_SOURCES);
-        var mySource = sourceCollection[0];
-        
+
         for (var j = 0; j < sourceCollection.length; j++) {
             var currentSource = sourceCollection[j];
             var known = false;
-            
+
             for (var i = 0; i < Memory.sourceDict.length; i++) {
                 var knownSource = Memory.sourceDict[i];
                 if (knownSource.sourceId == currentSource.id) {
@@ -24,13 +22,103 @@ var sourceHandler = {
         }
     },
 
+    /**
+     * inner mining function
+     *
+     * @param creep
+     * @param type
+     * @param target
+     * @returns {*}
+     * @private
+     */
+    _getEnergy: function(creep, type, target) {
+        var res;
+        switch (type) {
+            case RESOURCE_ENERGY: {
+                res = creep.pickup(target);
+                break;
+            }
+
+            case STRUCTURE_CONTAINER: {
+                res = creep.withdraw(target, RESOURCE_ENERGY);
+                break;
+            }
+
+            case LOOK_SOURCES: {
+                res = creep.harvest(target);
+                break;
+            }
+        }
+
+        if (res == ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+            return true;
+        }
+
+        return res;
+    },
+
+    /**
+     * find energy
+     * @param creep
+     */
+    getEnergy: function(creep) {
+        var energySource;
+        if (energySource = this.findDroppedEnergy(creep)) {
+            return this._getEnergy(creep, RESOURCE_ENERGY, energySource);
+        }
+
+        energySource = sourceHandler.findSource(creep);
+        if (creep.memory.role != 'harvester') {
+            var container;
+            if (container = sourceHandler.findContainer(creep)) {
+                var containerRange = creep.pos.getRangeTo(container);
+                var sourceRange = creep.pos.getRangeTo(energySource);
+
+                if (containerRange <= sourceRange) {
+                    return this._getEnergy(creep, STRUCTURE_CONTAINER, container);
+                }
+            }
+        }
+
+        return this._getEnergy(creep, LOOK_SOURCES, energySource);
+    },
+
+    /**
+     * find dropped energy in a very small range
+     *
+     * @param creep
+     * @returns {*}
+     */
+    findDroppedEnergy: function(creep) {
+        if (creep.memory.usedDroppedEnergyId) {
+            if (!Game.getObjectById(creep.memory.usedDroppedEnergyId)) {
+                creep.memory.usedDroppedEnergyId = null;
+            } else {
+                return Game.getObjectById(creep.memory.usedDroppedEnergyId);
+            }
+        }
+
+        var droppedEnergyCollection = creep.pos.findInRange(FIND_DROPPED_ENERGY, 2);
+        if (droppedEnergyCollection.length) {
+            return droppedEnergyCollection[0];
+        }
+
+        return false;
+    },
+
+    /**
+     * find source
+     *
+     * @param creep
+     * @returns {*}
+     */
     findSource: function(creep) {
         if (creep.memory.usedSourceId) {
-            var source = Game.getObjectById(creep.memory.usedSourceId);
-            if (!source || source == undefined) {
+            if (!Game.getObjectById(creep.memory.usedSourceId)) {
                 creep.memory.usedSourceId = null;
             } else {
-                return source;
+                return Game.getObjectById(creep.memory.usedSourceId);
             }
         }
 
@@ -66,39 +154,12 @@ var sourceHandler = {
     },
 
     findContainer: function(creep) {
-        var mySource = this.findSource(creep);
-        var containerCollection = creep.room.find(
+        return creep.pos.findClosestByRange(
             FIND_STRUCTURES, { filter: (structure) => { return (structure.structureType == STRUCTURE_CONTAINER &&
                 structure.store[RESOURCE_ENERGY] > 50);
             }
         });
-
-        var target = undefined;
-        var closest = undefined;
-        if (containerCollection.length) {
-            for (var i = 0; i < containerCollection.length; i++) {
-                var container = containerCollection[i];
-                var range = creep.pos.getRangeTo(container);
-                if (closest == undefined || range < closest) {
-                    target = container;
-                    closest = range;
-                }
-            }
-        }
-
-        if (target == undefined) {
-            return target;
-        }
-
-        var source = this.findSource(creep);
-        if (creep.pos.getRangeTo(source) < closest) {
-            return undefined;
-        }
-
-        return target;
     }
-
-
 
 }
 
