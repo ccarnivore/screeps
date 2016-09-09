@@ -5,7 +5,7 @@ var levelDefinition = {
     level1: { minEnergy: 0 }, level2: { minEnergy: 400 }
 };
 
-var creepLimit = 10;
+var creepLimit = 4;
 var minEnergyChunk = 50;
 var minCreepEnergyLevel = 200;
 
