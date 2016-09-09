@@ -35,3 +35,7 @@ const ENERGY_RELEVANCE = [
     {'container': 70}
 ];
 };*/
+
+module.exports = {
+    FOO: 'bar'
+};
