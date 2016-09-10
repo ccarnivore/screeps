@@ -169,7 +169,7 @@ var sourceHandler = {
                 && ((structure.store[RESOURCE_ENERGY] > 50 && structure.id != creep.memory.usedTarget)
                 || (structure.store[RESOURCE_ENERGY] > 1000))
             }
-        });
+        }});
 
         if (containers.length > 0) {
             return containers[0];
