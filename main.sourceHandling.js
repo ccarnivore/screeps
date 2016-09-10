@@ -166,7 +166,8 @@ var sourceHandler = {
     findContainer: function(creep) {
         return creep.pos.findClosestByRange(
             FIND_MY_STRUCTURES, { filter: function(structure) {
-                return (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > 50 && structure.id != creep.memory.usedTarget);
+                return (structure.structureType == STRUCTURE_CONTAINER &&
+                ((structure.store[RESOURCE_ENERGY] > 50 && structure.id != creep.memory.usedTarget) || (structure.store[RESOURCE_ENERGY] > 1000)));
             }
         });
     }
