@@ -164,18 +164,13 @@ var sourceHandler = {
     },
 
     findContainer: function(creep) {
-        var containers = creep.room.find(
-            FIND_MY_STRUCTURES, { filter: (structure) => { return (structure.structureType == STRUCTURE_CONTAINER
-                && ((structure.store[RESOURCE_ENERGY] > 50 && structure.id != creep.memory.usedTarget)
-                || (structure.store[RESOURCE_ENERGY] > 1000))
-            )}
-        }});
-
-        if (containers.length > 0) {
-            return containers[0];
-        }
-
-        return undefined;
+        return creep.pos.findClosestByRange(
+            FIND_MY_STRUCTURES, { filter: function(structure) {
+                return (
+                    structure.structureType == STRUCTURE_CONTAINER && ((structure.store[RESOURCE_ENERGY] > 50 && structure.id != creep.memory.usedTarget) || (structure.store[RESOURCE_ENERGY] > 1000))
+                );
+            }
+        });
     }
 
 }
