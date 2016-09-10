@@ -21,9 +21,9 @@ var roleHarvester = {
                         refillRelevanceB = c.REFILL_ENERGY_RELEVANCE[b.structureType];
 
                     if (a.structureType == STRUCTURE_CONTAINER) {
-                        refillRelevanceA += a.store[RESOURCE_ENERGY] - (a.store[RESOURCE_ENERGY] * creep.pos.getRangeTo(b));
+                        refillRelevanceA += a.store[RESOURCE_ENERGY] - (a.store[RESOURCE_ENERGY] * creep.pos.getRangeTo(a));
                     } else {
-                        refillRelevanceA += a.energy - (a.energy * creep.pos.getRangeTo(b));
+                        refillRelevanceA += a.energy - (a.energy * creep.pos.getRangeTo(a));
                     }
 
                     if (b.structureType == STRUCTURE_CONTAINER) {
