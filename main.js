@@ -28,10 +28,6 @@ module.exports.loop = function () {
 
         for(var name in Game.creeps) {
             var creep = Game.creeps[name];
-            if (creep.memory.goTo) {
-                creep.moveTo(creep.memory.goTo.X, creep.memory.goTo.Y);
-                return;
-            }
 
             switch(creep.memory.role) {
                 case c.CREEP_ROLE_BUILDER: {
