@@ -8,6 +8,11 @@ var roleDistributor = {
         creep.memory.work = creep.memory.work || c.CREEP_WORK_HARVESTING;
 
         if (creep.memory.work == c.CREEP_WORK_DISTRIBUTING) {
+            if (creep.carry.energy == 0) {
+                creep.memory.work = c.CREEP_WORK_HARVESTING;
+                return;
+            }
+
             var targets = creep.room.find(FIND_STRUCTURES, {filter: (structure) => {return (structure.structureType == STRUCTURE_TOWER
                     && structure.energy < structure.energyCapacity) ||
                     (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity) ||
