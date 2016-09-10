@@ -35,7 +35,7 @@ module.exports.loop = function () {
                 }
 
                 case c.CREEP_ROLE_UPGRADER: {
-                    roleUpgrader.run(creep);
+                    roleUpgrader.run(creep, spawn.room);
                     break;
                 }
 

@@ -51,10 +51,10 @@ module.exports = {
             minEnergy: 400,
             creepLimit: 14,
             creepInstances: {
-                harvester: 4,
+                harvester: 5,
                 builder: 3,
-                upgrader: 3,
-                distributor: 4
+                upgrader: 4,
+                distributor: 2
             },
             maxRepairFactor: {
                 'wall': 300,

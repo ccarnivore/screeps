@@ -6,14 +6,14 @@ var roleUpgrader = {
      *
      * @param creep
      */
-    run: function(creep) {
+    run: function(creep, room) {
         creep.memory.work = creep.memory.work || c.CREEP_WORK_HARVESTING;
 
         if (creep.memory.work == c.CREEP_WORK_UPGRADING) {
-            var res = creep.upgradeController(creep.room.controller);
+            var res = creep.upgradeController(room.controller);
             switch (res) {
                 case ERR_NOT_IN_RANGE: {
-                    creep.moveTo(creep.room.controller);
+                    creep.moveTo(room.controller);
                     return;
                 }
                 case ERR_NOT_ENOUGH_ENERGY: {
