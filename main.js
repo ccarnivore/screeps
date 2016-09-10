@@ -29,7 +29,7 @@ module.exports.loop = function () {
         for(var name in Game.creeps) {
             var creep = Game.creeps[name];
             if (creep.memory.goTo) {
-                creep.moveTo(goTo.X, goTo.Y);
+                creep.moveTo(creep.memory.goTo.X, creep.memory.goTo.Y);
                 return;
             }
 
