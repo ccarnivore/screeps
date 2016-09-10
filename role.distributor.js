@@ -93,6 +93,10 @@ var roleDistributor = {
                     }
                     break;
                 }
+                default: {
+                    creep.memory.work = c.CREEP_WORK_TRANSFERRING;
+                    break;
+                }
             }
 
             if (creep.carry.energy == creep.carryCapacity) {
