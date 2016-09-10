@@ -72,6 +72,11 @@ var roleHarvester = {
                     if (creep.carry.energy > 0) {
                         creep.memory.work = c.CREEP_WORK_TRANSFERRING;
                     }
+                    break;
+                }
+                default: {
+                    creep.memory.work = c.CREEP_WORK_TRANSFERRING;
+                    break;
                 }
             }
 
