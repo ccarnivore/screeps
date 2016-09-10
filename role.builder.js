@@ -59,34 +59,7 @@ var roleBuilder = {
 
         if (repairTargets.length) {
             repairTargets.sort(function(a, b) {
-                var valASource = a.hits,
-                    valABase = a.hitsMax,
-                    valBSource = b.hits,
-                    valBBase = b.hitsMax,
-                    defaultFactor = 2;
-
-                var factorA = defaultFactor;
-                if (a.hitsMax >= 100000000) {
-                    factorA = defaultFactor * 20000;
-                } else if (a.hitsMax >= 1000000) {
-                    factorA = defaultFactor * 200;
-                } else if (a.hitsMax >= 100000) {
-                    factorA = defaultFactor * 20;
-                }
-
-                var factorB = defaultFactor;
-                if (b.hitsMax >= 100000000) {
-                    factorB = defaultFactor * 20000;
-                } else if (b.hitsMax >= 1000000) {
-                    factorB = defaultFactor * 200;
-                } else if (b.hitsMax >= 100000) {
-                    factorB = defaultFactor * 2;
-                }
-
-                var minA = Math.abs(valASource / (valABase / factorA)),
-                    minB = Math.abs(valBSource / (valBBase / factorB));
-
-                return minA - minB;
+                return (a.hits / a.hitsMax - b.hits / b.hitsMax)
             });
 
             this._repair(creep, repairTargets[0], true);
