@@ -32,7 +32,7 @@ var roleHarvester = {
                         refillRelevanceB += b.energy;
                     }
 
-                    return refillRelevanceA - refillRelevanceB;
+                    return refillRelevanceB - refillRelevanceA;
                 });
 
                 switch(creep.transfer(targets[0], RESOURCE_ENERGY)) {
