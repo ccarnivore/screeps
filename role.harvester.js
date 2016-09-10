@@ -21,15 +21,15 @@ var roleHarvester = {
                         refillRelevanceB = c.REFILL_ENERGY_RELEVANCE[b.structureType];
 
                     if (a.structureType == STRUCTURE_CONTAINER) {
-                        refillRelevanceA += a.store[RESOURCE_ENERGY] - (a.store[RESOURCE_ENERGY] * creep.pos.getRangeTo(a));
+                        refillRelevanceA += a.store[RESOURCE_ENERGY];
                     } else {
-                        refillRelevanceA += a.energy - (a.energy * creep.pos.getRangeTo(a));
+                        refillRelevanceA += a.energy;
                     }
 
                     if (b.structureType == STRUCTURE_CONTAINER) {
-                        refillRelevanceB += b.store[RESOURCE_ENERGY] - (b.store[RESOURCE_ENERGY] * creep.pos.getRangeTo(b));
+                        refillRelevanceB += b.store[RESOURCE_ENERGY];
                     } else {
-                        refillRelevanceB += b.energy - (b.energy * creep.pos.getRangeTo(b));
+                        refillRelevanceB += b.energy;
                     }
 
                     return refillRelevanceA - refillRelevanceB;
