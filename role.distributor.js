@@ -94,7 +94,7 @@ var roleDistributor = {
                     break;
                 }
                 default: {
-                    creep.memory.work = c.CREEP_WORK_TRANSFERRING;
+                    creep.memory.work = c.CREEP_WORK_DISTRIBUTING;
                     break;
                 }
             }
