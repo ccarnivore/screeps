@@ -150,7 +150,7 @@ var creepHandler = {
                 Memory.isRepairBuilder = !Memory.isRepairBuilder;
             }
 
-            spawn.createCreep(buildPattern, null, creepArgs);
+            console.log(spawn.createCreep(buildPattern, null, creepArgs));
         } else {
             console.log('create ' + role + ' failed - no energy');
         }
