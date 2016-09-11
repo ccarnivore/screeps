@@ -59,7 +59,7 @@ module.exports = {
             maxRepairFactor: {
                 'constructedWall': 300,
                 'rampart': 30,
-                'road': 4
+                'road': 2
             }
         }
     },
