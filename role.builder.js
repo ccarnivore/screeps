@@ -62,6 +62,8 @@ var roleBuilder = {
                 return (a.hits / a.hitsMax - b.hits / b.hitsMax)
             });
 
+            console.log(repairTargets[0]);
+
             this._repair(creep, repairTargets[0], true);
             return true;
         }
