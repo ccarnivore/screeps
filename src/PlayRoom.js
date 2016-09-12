@@ -170,18 +170,20 @@ PlayRoom.prototype.getRoomController = function() {
  * @returns {*}
  */
 PlayRoom.prototype.getRepairableStructure = function(creep) {
-    if (creep.remember('repairStructureId') && (creep.remember('repairStructureSet') + 100) < Game.time) {
-        var repairStructure = Game.getObjectById(creep.remember('repairStructureId'));
-        if (repairStructure) {
-            return repairStructure;
+    if (creep.remember('repairStructureId') && ((creep.remember('repairStructureSet') + 100) > Game.time)) {
+        var object = Game.getObjectById(creep.remember('repairStructureId'));
+        if (object && object.hits < object.hitsMax) {
+            return object;
         }
     }
 
     if (cache.has('repairStructureCollection')) {
+        console.log('read caches repair targets');
         var cachedTargets = cache.get('repairStructureCollection');
         if (creep == undefined) {
             return cachedTargets[0];
         }
+
 
         cachedTargets.sort(function(a, b) {
             var repairLevelA = c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][a.structureType] || 1,
@@ -191,10 +193,12 @@ PlayRoom.prototype.getRepairableStructure = function(creep) {
         });
 
         creep.remember('repairStructureSet', Game.time);
+        console.log(creep.creep, 'set new repair target', cachedTargets[0]);
         creep.remember('repairStructureId', cachedTargets[0].id);
         return cachedTargets[0];
     }
 
+    console.log('create repair target cache');
     var targets = this.room.find(FIND_STRUCTURES, {
         filter: function(structure) {
             return (
@@ -215,8 +219,9 @@ PlayRoom.prototype.getRepairableStructure = function(creep) {
         }
     });
 
+    console.log('cached repair targets', JSON.stringify(targets));
     cache.set('repairStructureCollection', targets);
-    return this.getConstructionSite(creep);
+    return this.getRepairableStructure(creep);
 };
 
 /**
@@ -283,8 +288,6 @@ PlayRoom.prototype.getDestinationForHarvester = function(creep) {
         filter: function(structure) {
             return (
                     structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity
-                ) ||(
-                    structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity
                 ) || (
                     structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity
                 ) || (

@@ -25,18 +25,11 @@ module.exports = {
     CREEP_ROLE_UPGRADER: 'upgrader',
     CREEP_ROLE_REPAIRER: 'repairer',
 
-    CREEP_WORK_HARVESTING: 'harvesting',
-    CREEP_WORK_DISTRIBUTING: 'distributing',
-    CREEP_WORK_UPGRADING: 'upgrading',
-    CREEP_WORK_TRANSFERRING: 'transferring',
-
     CREEP_TASK_HARVESTING: 'harvesting',
-    CREEP_TASK_DISTRIBUTING: 'distributing',
     CREEP_TASK_UPGRADING: 'upgrading',
     CREEP_TASK_BUILDING: 'building',
     CREEP_TASK_REPAIRING: 'repairing',
     CREEP_TASK_TRANSFERRING: 'transferring',
-    CREEP_TASK_WORKING: 'working',
 
     LEVEL1: 'LEVEL1',
     LEVEL2: 'LEVEL2',
@@ -71,10 +64,10 @@ module.exports = {
                 distributor: 2
             },
             maxRepairFactor: {
-                'constructedWall': 3000,
-                'rampart': 30,
+                'constructedWall': 15000,
+                'rampart': 150,
                 'road': 2,
-                'container': 10
+                'container': 5
             }
         }
     },
@@ -90,8 +83,8 @@ module.exports = {
                 cost: 200
             },
             LEVEL2: {
-                pattern: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
-                cost: 300
+                pattern: [CARRY, CARRY, MOVE, MOVE],
+                cost: 200
             },
         },
         harvester: {
@@ -112,8 +105,8 @@ module.exports = {
                 cost: 200
             },
             LEVEL2: {
-                pattern: [WORK, WORK, CARRY, CARRY, MOVE],
-                cost: 350
+                pattern: [WORK, CARRY, MOVE],
+                cost: 200
             }
         },
         builder: {
@@ -123,8 +116,8 @@ module.exports = {
                 cost: 200
             },
             LEVEL2: {
-                pattern: [WORK, WORK, CARRY, CARRY, MOVE],
-                cost: 350
+                pattern: [WORK, CARRY, MOVE],
+                cost: 200
             }
         },
         repairer: {
@@ -134,8 +127,8 @@ module.exports = {
                 cost: 300
             },
             LEVEL2: {
-                pattern: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
-                cost: 500
+                pattern: [WORK, WORK, CARRY, MOVE],
+                cost: 300
             }
         }
     },

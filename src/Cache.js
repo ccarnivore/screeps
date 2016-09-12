@@ -32,4 +32,12 @@ Cache.get = function(key) {
     return this._cache[key];
 };
 
+Cache.remove = function(key) {
+    if (this._persistence) {
+        return delete Memory[key];
+    }
+
+    return delete this._cache[key];
+};
+
 module.exports = Cache;

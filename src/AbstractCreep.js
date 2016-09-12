@@ -159,13 +159,6 @@ AbstractCreep._harvestEnergy = function(creep) {
  */
 AbstractCreep._walk = function(target) {
     this.creep.moveTo(target);
-    if (this.creep.pos.lookFor(LOOK_TERRAIN) == 'swamp') {
-        cache.setPersistence(true);
-        var possibleRoad = cache.get('possibleRoadConstruction') || {};
-        possibleRoad[target] += 1;
-        cache.set('possibleRoadConstruction', possibleRoad);
-        cache.setPersistence(false);
-    }
 };
 
 module.exports = AbstractCreep;
