@@ -170,6 +170,13 @@ PlayRoom.prototype.getRoomController = function() {
  * @returns {*}
  */
 PlayRoom.prototype.getRepairableStructure = function(creep) {
+    if (creep.remember('repairStructureId') && (creep.remember('repairStructureSet') + 100) < Game.time) {
+        var repairStructure = Game.getObjectById(creep.remember('repairStructureId'));
+        if (repairStructure) {
+            return repairStructure;
+        }
+    }
+
     if (cache.has('repairStructureCollection')) {
         var cachedTargets = cache.get('repairStructureCollection');
         if (creep == undefined) {
@@ -183,6 +190,8 @@ PlayRoom.prototype.getRepairableStructure = function(creep) {
             return (a.hits / (a.hitsMax / repairLevelA) - b.hits / (b.hitsMax / repairLevelB));
         });
 
+        creep.remember('repairStructureSet', Game.time);
+        creep.remember('repairStructureId', cachedTargets[0].id);
         return cachedTargets[0];
     }
 

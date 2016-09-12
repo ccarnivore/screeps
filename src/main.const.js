@@ -45,30 +45,36 @@ module.exports = {
     LEVEL_DEFINITION: {
         LEVEL1: {
             minEnergy: 0,
-            creepLimit: 2,
+            creepLimit: 6,
             creepInstances: {
                 harvester: 2,
+                repairer: 1,
                 builder: 1,
                 upgrader: 1,
                 distributor: 1
             },
             maxRepairFactor: {
-                // repair disabled in level 1
+                'constructedWall': 30000,
+                'rampart': 300,
+                'road': 4,
+                'container': 10
             }
         },
         LEVEL2: {
             minEnergy: 400,
-            creepLimit: 14,
+            creepLimit: 13,
             creepInstances: {
-                harvester: 5,
-                builder: 3,
-                upgrader: 4,
+                harvester: 4,
+                builder: 2,
+                upgrader: 3,
+                repairer: 2,
                 distributor: 2
             },
             maxRepairFactor: {
                 'constructedWall': 3000,
                 'rampart': 30,
-                'road': 2
+                'road': 2,
+                'container': 10
             }
         }
     },
@@ -119,6 +125,17 @@ module.exports = {
             LEVEL2: {
                 pattern: [WORK, WORK, CARRY, CARRY, MOVE],
                 cost: 350
+            }
+        },
+        repairer: {
+            extensionOrder: [CARRY, CARRY, MOVE, MOVE, WORK, WORK],
+            LEVEL1: {
+                pattern: [WORK, WORK, CARRY, MOVE],
+                cost: 300
+            },
+            LEVEL2: {
+                pattern: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 500
             }
         }
     },

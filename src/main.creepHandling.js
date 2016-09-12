@@ -30,8 +30,8 @@ var creepHandler = {
         this.checkLevel(spawn);
 
         var creepCount = 0;
-        var creation = { harvester: 0, upgrader: 0, builder: 0, distributor: 0 };
-        var hasUpgrader = false, hasHarvester = false, hasBuilder = false;
+        var creation = { harvester: 0, upgrader: 0, builder: 0, distributor: 0, repairer: 0 };
+        var hasUpgrader = false, hasHarvester = false, hasBuilder = false, hasRepairer = false, hasDistributor = false;
 
         for (var creepName in Game.creeps) {
             creepCount ++;
@@ -42,16 +42,27 @@ var creepHandler = {
             }
 
             creation[creep.memory.role] += 1;
-            if (creep.memory.role == c.CREEP_ROLE_HARVESTER) {
-                hasHarvester = true;
-            }
-
-            if (creep.memory.role == c.CREEP_ROLE_UPGRADER) {
-                hasUpgrader = true;
-            }
-
-            if (creep.memory.role == c.CREEP_ROLE_BUILDER) {
-                hasBuilder = true;
+            switch (creep.memory.role) {
+                case c.CREEP_ROLE_HARVESTER: {
+                    hasHarvester = true;
+                    break;
+                }
+                case c.CREEP_ROLE_UPGRADER: {
+                    hasUpgrader = true;
+                    break;
+                }
+                case c.CREEP_ROLE_BUILDER: {
+                    hasBuilder = true;
+                    break;
+                }
+                case c.CREEP_ROLE_REPAIRER: {
+                    hasRepairer = true;
+                    break;
+                }
+                case c.CREEP_ROLE_DISTRIBUTOR: {
+                    hasDistributor = true;
+                    break;
+                }
             }
         }
 
@@ -71,6 +82,16 @@ var creepHandler = {
 
         if (!hasUpgrader) {
             this.createCreep(spawn, c.CREEP_ROLE_UPGRADER);
+            return;
+        }
+
+        if (!hasRepairer) {
+            this.createCreep(spawn, c.CREEP_ROLE_REPAIRER);
+            return;
+        }
+
+        if (!hasDistributor) {
+            this.createCreep(spawn, c.CREEP_ROLE_DISTRIBUTOR);
             return;
         }
 
