@@ -37,7 +37,7 @@ RepairCreep.prototype.doWork = function() {
         } else {
             // nothing to do and fully charged
             if (this._isFullyLoaded()) {
-                console.log(this.creep, this.remember('role'), 'resting');
+                this.morphTo(c.CREEP_ROLE_BUILDER);
                 return;
             }
 

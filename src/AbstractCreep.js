@@ -30,6 +30,17 @@ AbstractCreep.forget = function(key) {
 };
 
 /**
+ * role morphing
+ *
+ * @param newRole
+ */
+AbstractCreep.morphTo = function(newRole) {
+    console.log(this.creep, this.remember('role'), 'morphing to ', newRole);
+    this.remember('role', newRole);
+    this.forget('task');
+};
+
+/**
  * indicates the unit carries energy
  *
  * @returns {boolean}

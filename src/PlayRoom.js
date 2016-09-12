@@ -55,17 +55,43 @@ PlayRoom.prototype.getDroppedEnergy = function(creep, maxRange) {
  * @returns {*}
  */
 PlayRoom.prototype.getEnergyResource = function(creep) {
+    if (creep.remember('usedSourceId') && ((creep.remember('usedSourceSet') + 100) > Game.time)) {
+        var object = Game.getObjectById(creep.remember('usedSourceId'));
+        if (object) {
+            return object;
+        }
+    }
+
     if (cache.has('harvesterEnergyResourceCollection')) {
         var cachedResources = cache.get('harvesterEnergyResourceCollection');
         if (creep == undefined) {
             return cachedResources[0];
         }
 
+        cache.setPersistence(true);
+        var balance = cache.get('resourceBalancing') || {};
+
         cachedResources.sort(function(a, b) {
-            return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
+            balance[a.id] = balance[a.id] || [];
+            balance[b.id] = balance[b.id] || [];
+
+            var balanceFactorA = balance[a.id].length || 1,
+                balanceFactorB = balance[b.id].length || 1;
+
+            return creep.creep.pos.getRangeTo(a) * balanceFactorA - creep.creep.pos.getRangeTo(b) * balanceFactorB;
         });
 
-        return cachedResources[0];
+        var resource = cachedResources[0];
+        balance[resource.id] = balance[resource.id] || [];
+        balance[resource.id].push(creep.creep.id);
+        cache.set('resourceBalancing', balance);
+        cache.setPersistence(false);
+
+        console.log(creep.creep, 'set energy resource', resource, resource.pos);
+        creep.remember('usedSourceSet', Game.time);
+        creep.remember('usedSourceId', resource.id);
+
+        return resource;
     }
 
     var targets = this.room.find(FIND_SOURCES);
@@ -178,12 +204,14 @@ PlayRoom.prototype.getRepairableStructure = function(creep) {
     }
 
     if (cache.has('repairStructureCollection')) {
-        console.log('read caches repair targets');
         var cachedTargets = cache.get('repairStructureCollection');
         if (creep == undefined) {
             return cachedTargets[0];
         }
 
+        if (cachedTargets.length == 0) {
+            return false;
+        }
 
         cachedTargets.sort(function(a, b) {
             var repairLevelA = c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][a.structureType] || 1,
@@ -192,34 +220,36 @@ PlayRoom.prototype.getRepairableStructure = function(creep) {
             return (a.hits / (a.hitsMax / repairLevelA) - b.hits / (b.hitsMax / repairLevelB));
         });
 
+        var structure = cachedTargets[0];
         creep.remember('repairStructureSet', Game.time);
-        console.log(creep.creep, 'set new repair target', cachedTargets[0]);
-        creep.remember('repairStructureId', cachedTargets[0].id);
-        return cachedTargets[0];
+        creep.remember('repairStructureId', structure.id);
+        return structure;
     }
 
-    console.log('create repair target cache');
     var targets = this.room.find(FIND_STRUCTURES, {
         filter: function(structure) {
             return (
                 structure.structureType != STRUCTURE_ROAD
                     && structure.structureType != STRUCTURE_WALL
+                    && structure.structureType != STRUCTURE_CONTAINER
                     && structure.structureType != STRUCTURE_RAMPART
                     && structure.hits < structure.hitsMax
             ) || (
                 structure.structureType == STRUCTURE_ROAD
-                && structure.hits < (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_ROAD])
+                && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_ROAD])
+            ) || (
+                structure.structureType == STRUCTURE_CONTAINER
+                && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_CONTAINER])
             ) || (
                 structure.structureType == STRUCTURE_WALL
-                && structure.hits < (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_WALL])
+                && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_WALL])
             ) || (
                 structure.structureType == STRUCTURE_RAMPART
-                && structure.hits < (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_RAMPART])
+                && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_RAMPART])
             )
         }
     });
 
-    console.log('cached repair targets', JSON.stringify(targets));
     cache.set('repairStructureCollection', targets);
     return this.getRepairableStructure(creep);
 };
