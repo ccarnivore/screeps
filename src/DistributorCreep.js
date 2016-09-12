@@ -14,8 +14,7 @@ function DistributorCreep(creep) {
  * units main routing
  */
 DistributorCreep.prototype.doWork = function() {
-    var room = PlayRoomHandler.getRoom(this.creep.room.name),
-        sourceHandler = room.sourceHandler;
+    var room = PlayRoomHandler.getRoom(this.creep.room.name);
 
     if (!this.remember('task')) {
         this._isHarvesting(true);
@@ -26,7 +25,7 @@ DistributorCreep.prototype.doWork = function() {
             this._isHarvesting(true);
         }
 
-        var target = room.getDestinationForHarvester(this);
+        var target = room.getDestinationForDistributor(this);
         if (target) {
             this.remember('usedTarget', target.id);
             switch(this.creep.transfer(target, RESOURCE_ENERGY)) {
@@ -44,7 +43,7 @@ DistributorCreep.prototype.doWork = function() {
             }
         } else {
             if (this._isFullyLoaded()) {
-                console.log(this.creep, 'resting');
+                console.log(this.creep, this.remember('role'), 'resting');
                 return;
             }
 
@@ -53,23 +52,8 @@ DistributorCreep.prototype.doWork = function() {
     }
 
     if (this._isHarvesting()) {
-        switch (sourceHandler.getEnergy(this)) {
-            case ERR_FULL: {
-                this._isTransferring(true);
-                return;
-            }
-            case ERR_NOT_ENOUGH_RESOURCES: {
-                if (this._hasEnergy()) {
-                    this._isTransferring(true);
-                }
-                break;
-            }
-            case ERR_INVALID_ARGS: {
-                if (this._hasEnergy()) {
-                    this._isTransferring(true);
-                }
-                break;
-            }
+        if (!this._harvestEnergy(this)) {
+            this._isTransferring(true);
         }
 
         if (this._isFullyLoaded()) {

@@ -31,7 +31,7 @@ var creepHandler = {
 
         var creepCount = 0;
         var creation = { harvester: 0, upgrader: 0, builder: 0, distributor: 0 };
-        var hasUpgrader = false, hasBuilder = false;
+        var hasUpgrader = false, hasHarvester = false, hasBuilder = false;
 
         for (var creepName in Game.creeps) {
             creepCount ++;
@@ -42,6 +42,10 @@ var creepHandler = {
             }
 
             creation[creep.memory.role] += 1;
+            if (creep.memory.role == c.CREEP_ROLE_HARVESTER) {
+                hasHarvester = true;
+            }
+
             if (creep.memory.role == c.CREEP_ROLE_UPGRADER) {
                 hasUpgrader = true;
             }
@@ -55,7 +59,7 @@ var creepHandler = {
             return;
         }
 
-        if (creepCount == 0) {
+        if (creepCount == 0 || !hasHarvester) {
             this.createCreep(spawn, c.CREEP_ROLE_HARVESTER);
             return;
         }

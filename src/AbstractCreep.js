@@ -1,4 +1,5 @@
-var cache = require('Cache'),
+var PlayRoomHandler = require('PlayRoomHandler'),
+    cache = require('Cache'),
     c = require('main.const');
 
 var AbstractCreep = {};
@@ -78,9 +79,8 @@ AbstractCreep._isHarvesting = function(startHarvesting) {
     return this.remember('task', c.CREEP_TASK_HARVESTING);
 };
 
-
 /**
- * indicates the unit needs energy and is upgrading
+ * indicates the unit is upgrading
  *
  * @param startUpgrading let the unit start upgrading
  * @returns {boolean}
@@ -92,6 +92,62 @@ AbstractCreep._isUpgrading = function(startUpgrading) {
     }
 
     return this.remember('task', c.CREEP_TASK_UPGRADING);
+};
+
+/**
+ * indicates the unit is building
+ *
+ * @param startBuilding let the unit start upgrading
+ * @returns {boolean}
+ * @private
+ */
+AbstractCreep._isBuilding = function(startBuilding) {
+    if (startBuilding == undefined) {
+        return this.remember('task') == c.CREEP_TASK_BUILDING;
+    }
+
+    return this.remember('task', c.CREEP_TASK_BUILDING);
+};
+
+/**
+ * indicates the unit is repairing
+ *
+ * @param startRepairing let the unit start repairing
+ * @returns {boolean}
+ * @private
+ */
+AbstractCreep._isRepairing = function(startRepairing) {
+    if (startRepairing == undefined) {
+        return this.remember('task') == c.CREEP_TASK_REPAIRING;
+    }
+
+    return this.remember('task', c.CREEP_TASK_REPAIRING);
+};
+
+/**
+ * harvesting energy
+ *
+ * @param creep
+ * @returns {boolean}
+ * @private
+ */
+AbstractCreep._harvestEnergy = function(creep) {
+    var room = PlayRoomHandler.getRoom(creep.creep.room.name),
+        sourceHandler = room.sourceHandler;
+
+    switch (sourceHandler.getEnergy(creep)) {
+        case ERR_FULL: {
+            return false;
+        }
+        case ERR_NOT_ENOUGH_RESOURCES: {
+            return !this._hasEnergy();
+        }
+        case ERR_INVALID_ARGS: {
+            return !this._hasEnergy();
+        }
+    }
+
+    return true;
 };
 
 /**

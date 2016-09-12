@@ -1,4 +1,5 @@
-var PlayRoomHandler = require('PlayRoomHandler');
+var c = require('main.const'),
+    PlayRoomHandler = require('PlayRoomHandler');
 
 /**
  * units constructor
@@ -6,41 +7,35 @@ var PlayRoomHandler = require('PlayRoomHandler');
  * @param creep
  * @constructor
  */
-function UpgraderCreep(creep) {
+function RepairCreep(creep) {
     this.creep = creep;
 }
 
 /**
  * units main routing
  */
-UpgraderCreep.prototype.doWork = function() {
+RepairCreep.prototype.doWork = function() {
     var room = PlayRoomHandler.getRoom(this.creep.room.name);
 
     if (!this.remember('task')) {
         this._isHarvesting(true);
     }
 
-    if (this._isUpgrading()) {
+    if (this._isRepairing()) {
         if (!this._hasEnergy()) {
             this._isHarvesting(true);
         }
 
-        var controller = room.getRoomController();
-        if (controller) {
-            switch(this.creep.upgradeController(controller)) {
+        var target = room.getRepairableStructure(this);
+        if (target) {
+            switch(this.creep.repair(target)) {
                 case ERR_NOT_IN_RANGE: {
-                    this._walk(controller);
+                    this._walk(target);
                     break;
-                }
-                case ERR_NOT_ENOUGH_RESOURCES: {
-                    this._isHarvesting(true);
-                    break;
-                }
-                case ERR_FULL: {
-                    return;
                 }
             }
         } else {
+            // nothing to do and fully charged
             if (this._isFullyLoaded()) {
                 console.log(this.creep, this.remember('role'), 'resting');
                 return;
@@ -52,14 +47,14 @@ UpgraderCreep.prototype.doWork = function() {
 
     if (this._isHarvesting()) {
         if (!this._harvestEnergy(this)) {
-            this._isUpgrading(true);
+            this._isRepairing(true);
         }
 
         if (this._isFullyLoaded()) {
-            this._isUpgrading(true);
+            this._isRepairing(true);
         }
     }
 
 };
 
-module.exports = UpgraderCreep;
+module.exports = RepairCreep;
