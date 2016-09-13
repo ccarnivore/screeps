@@ -14,7 +14,7 @@ function UpgraderCreep(creep) {
  * units main routing
  */
 UpgraderCreep.prototype.doWork = function() {
-    var room = PlayRoomHandler.getRoom(this.creep.room.name);
+    var room = PlayRoomHandler.getRoom(this.remember('birthRoom'));
 
     if (!this.remember('task')) {
         this._isHarvesting(true);

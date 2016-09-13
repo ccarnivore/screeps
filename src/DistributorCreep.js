@@ -26,6 +26,7 @@ DistributorCreep.prototype.doWork = function() {
         }
 
         var target = room.getDestinationForDistributor(this);
+        console.log(this.creep, 'distribution target', target);
         if (target) {
             this.remember('usedTarget', target.id);
             switch(this.creep.transfer(target, RESOURCE_ENERGY)) {

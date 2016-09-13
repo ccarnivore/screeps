@@ -55,7 +55,7 @@ PlayRoom.prototype.getDroppedEnergy = function(creep, maxRange) {
  * @returns {*}
  */
 PlayRoom.prototype.getEnergyResource = function(creep) {
-    if (creep.remember('usedSourceId') && ((creep.remember('usedSourceSet') + 100) > Game.time)) {
+    if (creep.remember('usedSourceId') && ((creep.remember('usedSourceSet') + 3600) > Game.time)) {
         var object = Game.getObjectById(creep.remember('usedSourceId'));
         if (object) {
             return object;
@@ -118,6 +118,23 @@ PlayRoom.prototype.getContainer = function(creep) {
 };
 
 PlayRoom.prototype.getDestinationForDistributor = function(creep) {
+    if (creep.remember('distributionTargetId')) {
+        var target = Game.getObjectById(creep.remember('distributionTargetId'));
+        if (!target) {
+            creep.forget('distributionTargetId');
+        }
+
+        if (target.structureType == STRUCTURE_CONTAINER || target.structureType == STRUCTURE_STORAGE) {
+            if (target.store[RESOURCE_ENERGY] < target.storeCapacity) {
+                return target;
+            }
+        } else {
+            if (target.energy < target.energyCapacity) {
+                return target;
+            }
+        }
+    }
+
     if (cache.has('distributorDestinationCollection')) {
         var cachedTargets = cache.get('distributorDestinationCollection');
         if (creep == undefined) {
@@ -157,6 +174,7 @@ PlayRoom.prototype.getDestinationForDistributor = function(creep) {
                 continue;
             }
 
+            creep.remember('distributionTargetId', cachedTargets[currentTarget].id);
             return cachedTargets[currentTarget];
         }
 
@@ -200,6 +218,8 @@ PlayRoom.prototype.getRepairableStructure = function(creep) {
         var object = Game.getObjectById(creep.remember('repairStructureId'));
         if (object && object.hits < object.hitsMax) {
             return object;
+        } else {
+            creep.forget('repairStructureId');
         }
     }
 
@@ -271,7 +291,9 @@ PlayRoom.prototype.getConstructionSite = function(creep) {
             return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
         });
 
-        return cachedTargets[0];
+        if (cachedTargets[0]) {
+            return cachedTargets[0]
+        }
     }
 
     var targets = this.room.find(FIND_CONSTRUCTION_SITES);

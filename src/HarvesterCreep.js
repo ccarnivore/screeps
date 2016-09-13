@@ -26,6 +26,7 @@ HarvesterCreep.prototype.doWork = function() {
         }
 
         var target = room.getDestinationForHarvester(this);
+        console.log(this.creep, 'transfer', target);
         if (target) {
             switch(this.creep.transfer(target, RESOURCE_ENERGY)) {
                 case ERR_NOT_IN_RANGE: {

@@ -75,13 +75,18 @@ var creepHandler = {
             return;
         }
 
-        if (!hasBuilder) {
-            this.createCreep(spawn, c.CREEP_ROLE_BUILDER);
+        if (!hasUpgrader) {
+            this.createCreep(spawn, c.CREEP_ROLE_UPGRADER);
             return;
         }
 
-        if (!hasUpgrader) {
-            this.createCreep(spawn, c.CREEP_ROLE_UPGRADER);
+        var levelDefinition = c.LEVEL_DEFINITION[Memory.currentLevel];
+        if (creepCount >= c.GLOBAL_CREEP_LIMIT || creepCount >= levelDefinition.creepLimit) {
+            return;
+        }
+
+        if (!hasBuilder) {
+            this.createCreep(spawn, c.CREEP_ROLE_BUILDER);
             return;
         }
 
@@ -92,11 +97,6 @@ var creepHandler = {
 
         if (!hasDistributor) {
             this.createCreep(spawn, c.CREEP_ROLE_DISTRIBUTOR);
-            return;
-        }
-
-        var levelDefinition = c.LEVEL_DEFINITION[Memory.currentLevel];
-        if (creepCount >= c.GLOBAL_CREEP_LIMIT || creepCount >= levelDefinition.creepLimit) {
             return;
         }
 
@@ -169,7 +169,7 @@ var creepHandler = {
             }
 
             console.log('buildPattern after: ' + JSON.stringify(buildPattern));
-            var creepArgs = {role: role, canRepair: false};
+            var creepArgs = {role: role, canRepair: false, birthRoom: spawn.room.name};
             creepArgs.canRepair = Memory.isRepairBuilder;
             if (role == c.CREEP_ROLE_BUILDER) {
                 Memory.isRepairBuilder = !Memory.isRepairBuilder;
