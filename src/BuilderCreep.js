@@ -37,7 +37,6 @@ BuilderCreep.prototype.doWork = function() {
         } else {
             // nothing to do and fully charged
             if (this._isFullyLoaded()) {
-                this.morphTo(c.CREEP_ROLE_HARVESTER);
                 return;
             }
 

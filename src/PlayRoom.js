@@ -110,7 +110,7 @@ PlayRoom.prototype.getContainer = function(creep) {
         FIND_STRUCTURES, {
             filter: function(structure) {
                 return ((structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE)
-                    && structure.store[RESOURCE_ENERGY] > 50)
+                    && structure.store[RESOURCE_ENERGY] > 0)
                     && structure.id != creep.remember('usedTarget');
             }
         }
@@ -297,6 +297,9 @@ PlayRoom.prototype.getConstructionSite = function(creep) {
     }
 
     var targets = this.room.find(FIND_CONSTRUCTION_SITES);
+    if (!targets.length) {
+        return false;
+    }
 
     cache.set('constructionSiteCollection', targets);
     return this.getConstructionSite(creep);

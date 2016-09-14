@@ -5,7 +5,11 @@ var cache = require('Cache');
  * @type {{roomCollection: {}}}
  */
 var PlayRoomHandler = {
-    roomCollection: {}
+    roomCollection: {},
+    constructionSiteCollection: {},
+    enemyCollection: {},
+    repairStructureCollection: {},
+    resourceCollection: {}
 };
 
 /**

@@ -148,8 +148,12 @@ var creepHandler = {
             console.log('buildPattern before: ' + JSON.stringify(buildPattern));
 
             if (diff >= c.MIN_ENERGY_CHUNK) {
-                var i = 0, part, cost;
+                var i = 0, x = 0, part, cost;
                 while (diff >= c.MIN_ENERGY_CHUNK) {
+                    if (x > 12) {
+                        break;
+                    }
+
                     if (i == extensionOrder.length) {
                         i = 0;
                     }
@@ -158,6 +162,7 @@ var creepHandler = {
                     cost = BODYPART_COST[part];
 
                     if (diff - cost >= 0) {
+                        x++;
                         buildPattern.push(part);
                         diff -= cost;
                     } else {

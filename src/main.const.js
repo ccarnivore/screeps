@@ -20,6 +20,7 @@ module.exports = {
     GLOBAL_CREEP_LIMIT: 30,
 
     CREEP_ROLE_HARVESTER: 'harvester',
+    CREEP_ROLE_WARRIOR: 'warrior',
     CREEP_ROLE_DISTRIBUTOR: 'distributor',
     CREEP_ROLE_BUILDER: 'builder',
     CREEP_ROLE_UPGRADER: 'upgrader',
@@ -41,6 +42,7 @@ module.exports = {
             creepLimit: 6,
             creepInstances: {
                 harvester: 2,
+                warrior: 0,
                 repairer: 1,
                 builder: 1,
                 upgrader: 1,
@@ -64,8 +66,8 @@ module.exports = {
                 distributor: 2
             },
             maxRepairFactor: {
-                'constructedWall': 15000,
-                'rampart': 150,
+                'constructedWall': 10000,
+                'rampart': 100,
                 'road': 2,
                 'container': 5
             }
@@ -130,14 +132,25 @@ module.exports = {
                 pattern: [WORK, WORK, CARRY, MOVE],
                 cost: 300
             }
+        },
+        warrior: {
+            extensionOrder: [ATTACK, ATTACK, TOUGH, TOUGH, TOUGH],
+            LEVEL1: {
+                pattern: [ATTACK, MOVE],
+                cost: 200
+            },
+            LEVEL2: {
+                pattern: [MOVE, MOVE, ATTACK, ATTACK],
+                cost: 400
+            }
         }
     },
 
     DISTRIBUTION_ENERGY_RELEVANCE: {
         'spawn': 10000000,
-        'extension': 8000000,
-        'storage': 7700000,
-        'tower': 7500000,
+        'extension': 7700000,
+        'storage': 7500000,
+        'tower': 8000000,
         'container': 7000000
     },
 

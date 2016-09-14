@@ -15,7 +15,6 @@ var towerController = {
             return false;
         }
 
-        Game.notify('hostile creeps spotted');
         var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
         towers.forEach(tower => { var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS); tower.attack(target); });
 
@@ -72,7 +71,7 @@ var towerController = {
             }
 
             var repairTargets = tower.pos.findInRange(
-                FIND_MY_STRUCTURES, 10, {filter: (structure) => { return structure.hits < structure.hitsMax }
+                FIND_MY_STRUCTURES, 20, {filter: (structure) => { return structure.hits < structure.hitsMax }
             });
             if (repairTargets.length == 0) {
                 return false;
