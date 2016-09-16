@@ -56,20 +56,13 @@ SourceHandler.prototype.getEnergy = function(creep) {
         return this._getEnergy(creep, STRUCTURE_CONTAINER, usedContainer);
     }
 
-    energySource = this.room.getEnergyResource(creep);
-    if (creep.remember('role') != c.CREEP_ROLE_HARVESTER) {
-        var container;
-        if (container = this.room.getContainer(creep)) {
-            var containerRange = creep.creep.pos.getRangeTo(container);
-            var sourceRange = creep.creep.pos.getRangeTo(energySource);
-
-            if (containerRange <= sourceRange) {
-                return this._getEnergy(creep, STRUCTURE_CONTAINER, container);
-            }
-        }
+    if (creep.remember('role') == c.CREEP_ROLE_MINER || creep.remember('role') == c.CREEP_ROLE_HARVESTER) {
+        var resource = this.room.getEnergyResource(creep);
+        return this._getEnergy(creep, LOOK_SOURCES, resource);
     }
 
-    return this._getEnergy(creep, LOOK_SOURCES, energySource);
+    energySource = this.room.getEnergyStorageCollection(creep);
+    return this._getEnergy(creep, STRUCTURE_CONTAINER, energySource);
 };
 
 

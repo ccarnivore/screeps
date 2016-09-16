@@ -53,7 +53,7 @@ var towerController = {
      */
     repairStructures: function(room) {
         var towers = room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
-        towers.forEach(tower => { if (tower.energy <= 150) { return };
+        towers.forEach(tower => { if (tower.energy <= 100) { return };
             var repairTarget;
             Memory.tower = Memory.tower || {};
             var towerData = Memory.tower[tower.id];
@@ -70,15 +70,39 @@ var towerController = {
                 }
             }
 
-            var repairTargets = tower.pos.findInRange(
-                FIND_MY_STRUCTURES, 20, {filter: (structure) => { return structure.hits < structure.hitsMax }
+            var repairTargets = tower.pos.findInRange(FIND_STRUCTURES, 20, {
+                filter: function(structure) {
+                    return (
+                            structure.structureType != STRUCTURE_ROAD
+                            && structure.structureType != STRUCTURE_WALL
+                            && structure.structureType != STRUCTURE_CONTAINER
+                            && structure.structureType != STRUCTURE_RAMPART
+                            && structure.hits < structure.hitsMax
+                        ) || (
+                            structure.structureType == STRUCTURE_ROAD
+                            && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_ROAD])
+                        ) || (
+                            structure.structureType == STRUCTURE_CONTAINER
+                            && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_CONTAINER])
+                        ) || (
+                            structure.structureType == STRUCTURE_WALL
+                            && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_WALL])
+                        ) || (
+                            structure.structureType == STRUCTURE_RAMPART
+                            && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_RAMPART])
+                        )
+                }
             });
+
             if (repairTargets.length == 0) {
                 return false;
             }
 
-            repairTargets.sort(function (a, b) {
-                return a.hits / a.hitsMax - b.hits / b.hitsMax;
+            repairTargets.sort(function(a, b) {
+                var repairLevelA = c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][a.structureType] || 1,
+                    repairLevelB = c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][b.structureType] || 1;
+
+                return (a.hits / (a.hitsMax / repairLevelA) - b.hits / (b.hitsMax / repairLevelB));
             });
 
             repairTarget = repairTargets[0];

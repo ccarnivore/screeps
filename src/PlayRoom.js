@@ -5,7 +5,66 @@ var c = require('main.const'),
 function PlayRoom(room) {
     this.room = room;
     this.sourceHandler = new SourceHandler(this);
+
+    this.energyResourceCollection = {};
+    this.invaderCollection = {};
+    this.constructionSiteCollection = {};
+    this.repairableStructureCollection = {};
+    this.droppedEnergyCollection = {};
 }
+
+PlayRoom.prototype.getName = function() {
+    return this.room.name;
+};
+
+PlayRoom.prototype.getDroppedEnergyCollection = function() {
+    this.droppedEnergyCollection = this.room.find(FIND_DROPPED_ENERGY);
+    return this.droppedEnergyCollection;
+}
+
+PlayRoom.prototype.getEnergyResourceCollection = function() {
+    this.energyResourceCollection = this.room.find(FIND_SOURCES);
+    return this.energyResourceCollection;
+};
+
+PlayRoom.prototype.getInvaderCollection = function() {
+    this.invaderCollection = this.room.find(FIND_HOSTILE_CREEPS);
+    return this.invaderCollection;
+};
+
+PlayRoom.prototype.getConstructionSiteCollection = function() {
+    this.constructionSiteCollection = this.room.find(FIND_CONSTRUCTION_SITES);
+    return this.constructionSiteCollection;
+};
+
+PlayRoom.prototype.getRepairableStructureCollection = function() {
+    this.repairableStructureCollection = this.room.find(FIND_STRUCTURES, {
+        filter: function(structure) {
+            return (
+                    structure.structureType != STRUCTURE_ROAD
+                    && structure.structureType != STRUCTURE_WALL
+                    && structure.structureType != STRUCTURE_CONTAINER
+                    && structure.structureType != STRUCTURE_RAMPART
+                    && structure.hits < structure.hitsMax
+                ) || (
+                    structure.structureType == STRUCTURE_ROAD
+                    && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_ROAD])
+                ) || (
+                    structure.structureType == STRUCTURE_CONTAINER
+                    && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_CONTAINER])
+                ) || (
+                    structure.structureType == STRUCTURE_WALL
+                    && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_WALL])
+                ) || (
+                    structure.structureType == STRUCTURE_RAMPART
+                    && structure.hits <= (structure.hitsMax / c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][STRUCTURE_RAMPART])
+                )
+        }
+    });
+
+    return this.repairableStructureCollection;
+};
+
 
 /**
  * find dropped energy in room
@@ -112,6 +171,28 @@ PlayRoom.prototype.getContainer = function(creep) {
                 return ((structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE)
                     && structure.store[RESOURCE_ENERGY] > 0)
                     && structure.id != creep.remember('usedTarget');
+            }
+        }
+    );
+};
+
+/**
+ * finds a container for getting energy from
+ *
+ * @param creep
+ * @returns {*}
+ */
+PlayRoom.prototype.getEnergyStorageCollection = function(creep) {
+    return creep.creep.pos.findClosestByRange(
+        FIND_STRUCTURES, {
+            filter: function(structure) {
+                return (
+                    (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE)
+                    && structure.store[RESOURCE_ENERGY] > 0
+                ) || (
+                    (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN)
+                    && structure.energy > 0
+                );
             }
         }
     );

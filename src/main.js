@@ -5,8 +5,10 @@ var creepHandler = require('main.creepHandling');
 var towerController = require('main.towerController');
 
 var Util = require('Util'),
+    WorldController = require('WorldController'),
     AbstractCreep = require('AbstractCreep'),
     HarvesterCreep = require('HarvesterCreep'),
+    MinerCreep = require('MinerCreep'),
     DistributorCreep = require('DistributorCreep'),
     UpgraderCreep = require('UpgraderCreep'),
     BuilderCreep = require('BuilderCreep'),
@@ -16,6 +18,9 @@ var Util = require('Util'),
 
 
 console.log('received tick');
+/*WorldController.measureWorld();
+WorldController.debugInfo();*/
+
 PlayRoomHandler.measureWorld();
 
 for (var spawnName in Game.spawns) {
@@ -33,10 +38,10 @@ for (var spawnName in Game.spawns) {
         }
     }
 
-    for(var name in Game.creeps) {
+    for (var name in Game.creeps) {
         var creep = Game.creeps[name];
         var wrappedCreep;
-        switch(creep.memory.role) {
+        switch (creep.memory.role) {
             case c.CREEP_ROLE_BUILDER: {
                 wrappedCreep = new BuilderCreep(creep);
                 break;
@@ -58,6 +63,11 @@ for (var spawnName in Game.spawns) {
 
             case c.CREEP_ROLE_DISTRIBUTOR: {
                 wrappedCreep = new DistributorCreep(creep);
+                break;
+            }
+
+            case c.CREEP_ROLE_MINER: {
+                wrappedCreep = new MinerCreep(creep);
                 break;
             }
 

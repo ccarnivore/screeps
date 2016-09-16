@@ -91,6 +91,21 @@ AbstractCreep._isHarvesting = function(startHarvesting) {
 };
 
 /**
+ * indicates the unit is mining
+ *
+ * @param startMining let the unit start mining
+ * @returns {boolean}
+ * @private
+ */
+AbstractCreep._isMining = function(startMining) {
+    if (startMining == undefined) {
+        return this.remember('task') == c.CREEP_TASK_MINING;
+    }
+
+    return this.remember('task', c.CREEP_TASK_MINING);
+};
+
+/**
  * indicates the unit is upgrading
  *
  * @param startUpgrading let the unit start upgrading

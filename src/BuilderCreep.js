@@ -27,6 +27,7 @@ BuilderCreep.prototype.doWork = function() {
         }
 
         var target = room.getConstructionSite(this);
+        console.log(this.creep, 'building', target);
         if (target) {
             switch(this.creep.build(target)) {
                 case ERR_NOT_IN_RANGE: {

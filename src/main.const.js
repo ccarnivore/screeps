@@ -20,6 +20,7 @@ module.exports = {
     GLOBAL_CREEP_LIMIT: 30,
 
     CREEP_ROLE_HARVESTER: 'harvester',
+    CREEP_ROLE_MINER: 'miner',
     CREEP_ROLE_WARRIOR: 'warrior',
     CREEP_ROLE_DISTRIBUTOR: 'distributor',
     CREEP_ROLE_BUILDER: 'builder',
@@ -27,6 +28,7 @@ module.exports = {
     CREEP_ROLE_REPAIRER: 'repairer',
 
     CREEP_TASK_HARVESTING: 'harvesting',
+    CREEP_TASK_MINING: 'mining',
     CREEP_TASK_UPGRADING: 'upgrading',
     CREEP_TASK_BUILDING: 'building',
     CREEP_TASK_REPAIRING: 'repairing',
@@ -39,14 +41,15 @@ module.exports = {
     LEVEL_DEFINITION: {
         LEVEL1: {
             minEnergy: 0,
-            creepLimit: 6,
+            creepLimit: 8,
             creepInstances: {
-                harvester: 2,
+                harvester: 1,
+                miner: 2,
+                distributor: 1,
                 warrior: 0,
                 repairer: 1,
                 builder: 1,
-                upgrader: 1,
-                distributor: 1
+                upgrader: 1
             },
             maxRepairFactor: {
                 'constructedWall': 30000,
@@ -57,17 +60,18 @@ module.exports = {
         },
         LEVEL2: {
             minEnergy: 400,
-            creepLimit: 13,
+            creepLimit: 14,
             creepInstances: {
-                harvester: 4,
+                miner: 2,
+                harvester: 2,
+                distributor: 2,
                 builder: 2,
-                upgrader: 3,
-                repairer: 2,
-                distributor: 2
+                upgrader: 4,
+                repairer: 2
             },
             maxRepairFactor: {
-                'constructedWall': 10000,
-                'rampart': 100,
+                'constructedWall': 1000,
+                'rampart': 10,
                 'road': 2,
                 'container': 5
             }
@@ -133,6 +137,17 @@ module.exports = {
                 cost: 300
             }
         },
+        miner: {
+            extensionOrder: [WORK, WORK, WORK, WORK],
+            LEVEL1: {
+                pattern: [WORK, WORK, MOVE],
+                cost: 250
+            },
+            LEVEL2: {
+                pattern: [WORK, WORK, WORK, MOVE],
+                cost: 350
+            }
+        },
         warrior: {
             extensionOrder: [ATTACK, ATTACK, TOUGH, TOUGH, TOUGH],
             LEVEL1: {
@@ -147,18 +162,18 @@ module.exports = {
     },
 
     DISTRIBUTION_ENERGY_RELEVANCE: {
-        'spawn': 10000000,
-        'extension': 7700000,
-        'storage': 7500000,
-        'tower': 8000000,
-        'container': 7000000
+        'spawn':        10000000,
+        'extension':    7700000,
+        'tower':        7600000,
+        'storage':      7500000,
+        'container':    7000000
     },
 
     REFILL_ENERGY_RELEVANCE: {
-        'spawn': 300000,
-        'container': 1000,
-        'storage': 1000,
-        'extension': 5000
+        'spawn':        300000,
+        'extension':    5000,
+        'container':    1000,
+        'storage':      1000
     }
 
 };
