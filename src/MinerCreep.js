@@ -17,6 +17,7 @@ MinerCreep.prototype.doWork = function() {
     }
 
     if (this._isMining()) {
+        console.log(this.creep, 'mining');
         this._harvestEnergy(this);
     }
 

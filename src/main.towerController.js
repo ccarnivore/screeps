@@ -63,7 +63,7 @@ var towerController = {
 
             if (towerData.repairObjectId && ((Game.time - towerData.repairObjectTime) < 50)) {
                 repairTarget = Game.getObjectById(towerData.repairObjectId);
-                if (repairTarget) {
+                if (repairTarget && repairTarget.hits < repairTarget.hitsMax) {
                     tower.repair(repairTarget);
 
                     return true;

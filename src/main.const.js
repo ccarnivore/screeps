@@ -41,9 +41,9 @@ module.exports = {
     LEVEL_DEFINITION: {
         LEVEL1: {
             minEnergy: 0,
-            creepLimit: 8,
+            creepLimit: 9,
             creepInstances: {
-                harvester: 1,
+                harvester: 2,
                 miner: 2,
                 distributor: 1,
                 warrior: 0,
@@ -60,10 +60,10 @@ module.exports = {
         },
         LEVEL2: {
             minEnergy: 400,
-            creepLimit: 14,
+            creepLimit: 18,
             creepInstances: {
-                miner: 2,
-                harvester: 2,
+                miner: 4,
+                harvester: 4,
                 distributor: 2,
                 builder: 2,
                 upgrader: 4,
@@ -94,13 +94,13 @@ module.exports = {
             },
         },
         harvester: {
-            extensionOrder: [CARRY, CARRY, WORK, MOVE],
+            extensionOrder: [CARRY, CARRY, MOVE],
             LEVEL1: {
                 pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
                 cost: 300
             },
             LEVEL2: {
-                pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
+                pattern: [WORK, CARRY, CARRY, CARRY, MOVE],
                 cost: 300
             },
         },
@@ -144,8 +144,8 @@ module.exports = {
                 cost: 250
             },
             LEVEL2: {
-                pattern: [WORK, WORK, WORK, MOVE],
-                cost: 350
+                pattern: [WORK, WORK, MOVE],
+                cost: 250
             }
         },
         warrior: {

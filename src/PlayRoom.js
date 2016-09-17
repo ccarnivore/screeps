@@ -83,7 +83,7 @@ PlayRoom.prototype.getDroppedEnergy = function(creep, maxRange) {
         return target;
     }
 
-    maxRange = maxRange || 2;
+    maxRange = maxRange || 4;
     if (cache.has('droppedEnergyCollection')) {
         var cachedResources = cache.get('droppedEnergyCollection');
         if (creep == undefined) {
@@ -127,23 +127,9 @@ PlayRoom.prototype.getEnergyResource = function(creep) {
             return cachedResources[0];
         }
 
-        cache.setPersistence(true);
-        var balance = cache.get('resourceBalancing') || {};
-
-        cachedResources.sort(function(a, b) {
-            balance[a.id] = balance[a.id] || [];
-            balance[b.id] = balance[b.id] || [];
-
-            var balanceFactorA = balance[a.id].length || 1,
-                balanceFactorB = balance[b.id].length || 1;
-
-            return creep.creep.pos.getRangeTo(a) * balanceFactorA - creep.creep.pos.getRangeTo(b) * balanceFactorB;
-        });
-
         var resource = cachedResources[0];
-        balance[resource.id] = balance[resource.id] || [];
-        balance[resource.id].push(creep.creep.id);
-        cache.set('resourceBalancing', balance);
+        cache.setPersistence(true);
+        cache.set('lastAssignedSourceId' + creep.remember('role'), resource.id);
         cache.setPersistence(false);
 
         console.log(creep.creep, 'set energy resource', resource, resource.pos);
@@ -153,7 +139,16 @@ PlayRoom.prototype.getEnergyResource = function(creep) {
         return resource;
     }
 
-    var targets = this.room.find(FIND_SOURCES);
+
+    cache.setPersistence(true);
+    var targets = this.room.find(
+        FIND_SOURCES, {
+            filter: function(resource) {
+                return resource.id != cache.get('lastAssignedSourceId' + creep.remember('role'));
+            }
+    });
+    cache.setPersistence(false);
+
     cache.set('harvesterEnergyResourceCollection', targets);
     return this.getEnergyResource(creep);
 };
@@ -165,10 +160,15 @@ PlayRoom.prototype.getEnergyResource = function(creep) {
  * @returns {*}
  */
 PlayRoom.prototype.getContainer = function(creep) {
+    var storage = creep.creep.room.find(FIND_MY_STRUCTURES, {filter: function(structure) { return structure.structureType == STRUCTURE_STORAGE}});
+    if (storage) {
+        return storage[0];
+    }
+
     return creep.creep.pos.findClosestByRange(
         FIND_STRUCTURES, {
             filter: function(structure) {
-                return ((structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE)
+                return ((structure.structureType == STRUCTURE_CONTAINER)
                     && structure.store[RESOURCE_ENERGY] > 0)
                     && structure.id != creep.remember('usedTarget');
             }
@@ -190,7 +190,7 @@ PlayRoom.prototype.getEnergyStorageCollection = function(creep) {
                     (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE)
                     && structure.store[RESOURCE_ENERGY] > 0
                 ) || (
-                    (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN)
+                    (structure.structureType == STRUCTURE_EXTENSION)
                     && structure.energy > 0
                 );
             }
@@ -269,7 +269,6 @@ PlayRoom.prototype.getDestinationForDistributor = function(creep) {
                     || (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity)
                     || (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity)
                     || (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity)
-                    || (structure.structureType == STRUCTURE_STORAGE && structure.store[RESOURCE_ENERGY] < structure.storeCapacity)
 
             }
         }

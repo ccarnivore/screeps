@@ -84,7 +84,7 @@ var creepHandler = {
             return;
         }
 
-        if (!hasMiner) {
+        if (!hasMiner || creation.miner < 2) {
             this.createCreep(spawn, c.CREEP_ROLE_MINER);
             return;
         }
@@ -99,11 +99,6 @@ var creepHandler = {
             return;
         }
 
-        if (!hasBuilder) {
-            this.createCreep(spawn, c.CREEP_ROLE_BUILDER);
-            return;
-        }
-
         if (!hasRepairer) {
             this.createCreep(spawn, c.CREEP_ROLE_REPAIRER);
             return;
@@ -111,6 +106,11 @@ var creepHandler = {
 
         if (!hasDistributor) {
             this.createCreep(spawn, c.CREEP_ROLE_DISTRIBUTOR);
+            return;
+        }
+
+        if (!hasBuilder) {
+            this.createCreep(spawn, c.CREEP_ROLE_BUILDER);
             return;
         }
 
