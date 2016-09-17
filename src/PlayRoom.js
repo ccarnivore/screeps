@@ -1,4 +1,4 @@
-var c = require('main.const'),
+var c = require('Const'),
     cache = require('Cache'),
     SourceHandler = require('SourceHandler');
 
@@ -11,16 +11,32 @@ function PlayRoom(room) {
     this.constructionSiteCollection = {};
     this.repairableStructureCollection = {};
     this.droppedEnergyCollection = {};
+
+    this.storage = null
 }
 
 PlayRoom.prototype.getName = function() {
     return this.room.name;
 };
 
+PlayRoom.prototype.getStorage = function() {
+    var storageCollection = this.room.find(FIND_MY_STRUCTURES, {
+        filter: function(structure) {
+            return structure.structureType == STRUCTURE_STORAGE
+        }
+    });
+
+    if (storageCollection.length > 0) {
+        this.storage = storageCollection[0];
+    }
+
+    return this.storage;
+};
+
 PlayRoom.prototype.getDroppedEnergyCollection = function() {
     this.droppedEnergyCollection = this.room.find(FIND_DROPPED_ENERGY);
     return this.droppedEnergyCollection;
-}
+};
 
 PlayRoom.prototype.getEnergyResourceCollection = function() {
     this.energyResourceCollection = this.room.find(FIND_SOURCES);
@@ -30,6 +46,15 @@ PlayRoom.prototype.getEnergyResourceCollection = function() {
 PlayRoom.prototype.getInvaderCollection = function() {
     this.invaderCollection = this.room.find(FIND_HOSTILE_CREEPS);
     return this.invaderCollection;
+};
+
+PlayRoom.prototype.getTowerCollection = function() {
+    this.towerCollection = this.room.find(FIND_MY_STRUCTURES, {
+        filter: function(structure) {
+            return structure.structureType == STRUCTURE_TOWER;
+        }
+    });
+    return this.towerCollection;
 };
 
 PlayRoom.prototype.getConstructionSiteCollection = function() {
@@ -199,6 +224,7 @@ PlayRoom.prototype.getEnergyStorageCollection = function(creep) {
 };
 
 PlayRoom.prototype.getDestinationForDistributor = function(creep) {
+    var renewCache = false;
     if (creep.remember('distributionTargetId')) {
         var target = Game.getObjectById(creep.remember('distributionTargetId'));
         if (!target) {
@@ -214,9 +240,12 @@ PlayRoom.prototype.getDestinationForDistributor = function(creep) {
                 return target;
             }
         }
+
+        creep.forget('distributionTargetId');
+        renewCache = true;
     }
 
-    if (cache.has('distributorDestinationCollection')) {
+    if (cache.has('distributorDestinationCollection') && !renewCache) {
         var cachedTargets = cache.get('distributorDestinationCollection');
         if (creep == undefined) {
             return cachedTargets[0];
@@ -294,16 +323,18 @@ PlayRoom.prototype.getRoomController = function() {
  * @returns {*}
  */
 PlayRoom.prototype.getRepairableStructure = function(creep) {
+    var renewCache = false;
     if (creep.remember('repairStructureId') && ((creep.remember('repairStructureSet') + 100) > Game.time)) {
         var object = Game.getObjectById(creep.remember('repairStructureId'));
         if (object && object.hits < object.hitsMax) {
             return object;
-        } else {
-            creep.forget('repairStructureId');
         }
+
+        creep.forget('repairStructureId');
+        renewCache = true;
     }
 
-    if (cache.has('repairStructureCollection')) {
+    if (cache.has('repairStructureCollection') && !renewCache) {
         var cachedTargets = cache.get('repairStructureCollection');
         if (creep == undefined) {
             return cachedTargets[0];
@@ -372,7 +403,9 @@ PlayRoom.prototype.getConstructionSite = function(creep) {
         });
 
         if (cachedTargets[0]) {
-            return cachedTargets[0]
+            if (Game.getObjectById(cachedTargets[0].id)) {
+                return cachedTargets[0]
+            }
         }
     }
 
@@ -401,16 +434,18 @@ PlayRoom.prototype.getDestinationForHarvester = function(creep) {
             var refillRelevanceA = c.REFILL_ENERGY_RELEVANCE[a.structureType],
                 refillRelevanceB = c.REFILL_ENERGY_RELEVANCE[b.structureType];
 
-            if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE) {
-                refillRelevanceA += a.store[RESOURCE_ENERGY] - (a.store[RESOURCE_ENERGY] * creep.creep.pos.getRangeTo(a));
-            } else {
-                refillRelevanceA += a.energy - (a.energy * creep.creep.pos.getRangeTo(a));
-            }
+            if (a.structureType == b.structureType) {
+                if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE) {
+                    refillRelevanceA += a.store[RESOURCE_ENERGY] - (a.store[RESOURCE_ENERGY] * creep.creep.pos.getRangeTo(a));
+                } else {
+                    refillRelevanceA += a.energy - (a.energy * creep.creep.pos.getRangeTo(a));
+                }
 
-            if (b.structureType == STRUCTURE_CONTAINER || b.structureType == STRUCTURE_STORAGE) {
-                refillRelevanceB += b.store[RESOURCE_ENERGY] - (b.store[RESOURCE_ENERGY] * creep.creep.pos.getRangeTo(b));
-            } else {
-                refillRelevanceB += b.energy - (b.energy * creep.creep.pos.getRangeTo(b));
+                if (b.structureType == STRUCTURE_CONTAINER || b.structureType == STRUCTURE_STORAGE) {
+                    refillRelevanceB += b.store[RESOURCE_ENERGY] - (b.store[RESOURCE_ENERGY] * creep.creep.pos.getRangeTo(b));
+                } else {
+                    refillRelevanceB += b.energy - (b.energy * creep.creep.pos.getRangeTo(b));
+                }
             }
 
             return refillRelevanceB - refillRelevanceA;

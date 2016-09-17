@@ -1,6 +1,3 @@
-var c = require('main.const'),
-    PlayRoomHandler = require('PlayRoomHandler');
-
 /**
  * units constructor
  *
@@ -15,7 +12,7 @@ function RepairCreep(creep) {
  * units main routing
  */
 RepairCreep.prototype.doWork = function() {
-    var room = PlayRoomHandler.getRoom(this.creep.room.name);
+    var room = this.worldController.getRoom(this.creep.room.name);
 
     if (!this.remember('task')) {
         this._isHarvesting(true);

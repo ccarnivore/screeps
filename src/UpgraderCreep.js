@@ -1,5 +1,3 @@
-var PlayRoomHandler = require('PlayRoomHandler');
-
 /**
  * units constructor
  *
@@ -14,7 +12,7 @@ function UpgraderCreep(creep) {
  * units main routing
  */
 UpgraderCreep.prototype.doWork = function() {
-    var room = PlayRoomHandler.getRoom(this.remember('birthRoom'));
+    var room = this.worldController.getRoom(this.remember('birthRoom'));
 
     if (!this.remember('task')) {
         this._isHarvesting(true);

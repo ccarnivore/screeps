@@ -1,4 +1,4 @@
-var c = require('main.const');
+var c = require('Const');
 
 function SourceHandler(playRoom) {
     this.room = playRoom;

@@ -1,5 +1,3 @@
-var PlayRoomHandler = require('PlayRoomHandler');
-
 /**
  * units constructor
  *
@@ -14,7 +12,7 @@ function DistributorCreep(creep) {
  * units main routing
  */
 DistributorCreep.prototype.doWork = function() {
-    var room = PlayRoomHandler.getRoom(this.creep.room.name);
+    var room = this.worldController.getRoom(this.creep.room.name);
 
     if (!this.remember('task')) {
         this._isHarvesting(true);

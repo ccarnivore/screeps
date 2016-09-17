@@ -1,8 +1,12 @@
-var PlayRoomHandler = require('PlayRoomHandler'),
-    cache = require('Cache'),
-    c = require('main.const');
+var c = require('Const');
 
-var AbstractCreep = {};
+var AbstractCreep = {
+    worldController: null
+};
+
+AbstractCreep.setWorldController = function(worldCtrl) {
+    this.worldController = worldCtrl;
+};
 
 /**
  * units memory access
@@ -158,7 +162,7 @@ AbstractCreep._isRepairing = function(startRepairing) {
  * @private
  */
 AbstractCreep._harvestEnergy = function(creep) {
-    var room = PlayRoomHandler.getRoom(creep.creep.room.name),
+    var room = this.worldController.getRoom(creep.creep.room.name),
         sourceHandler = room.sourceHandler;
 
     switch (sourceHandler.getEnergy(creep)) {

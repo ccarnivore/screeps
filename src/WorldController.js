@@ -8,7 +8,10 @@ var WorldController = {
     enemyCollection: {},
     repairStructureCollection: {},
     resourceCollection: {},
-    energyCollection: {}
+    energyCollection: {},
+    towerCollection: {},
+
+    storage: null
 };
 
 WorldController.getRoom = function(roomName) {
@@ -26,7 +29,7 @@ WorldController.measureWorld = function() {
 
         if (!discoveredRoomCollection[i]) {
             console.log('discovering room', i);
-            var playRoom = new PlayRoom(room, this);
+            var playRoom = new PlayRoom(room);
             this.measureRoom(playRoom);
 
             discoveredRoomCollection[i] = playRoom;
@@ -38,11 +41,16 @@ WorldController.measureWorld = function() {
 };
 
 WorldController.measureRoom = function(room) {
-    this.constructionSiteCollection[room.getName()] = room.getConstructionSiteCollection();
-    this.enemyCollection[room.getName()] = room.getInvaderCollection();
-    this.resourceCollection[room.getName()] = room.getEnergyResourceCollection();
-    this.repairStructureCollection[room.getName()] = room.getRepairableStructureCollection();
-    this.energyCollection[room.getName()] = room.getDroppedEnergyCollection();
+    //this.storage = this.storage || room.getStorage();
+
+    //this.energyCollection[room.getName()] = room.getDroppedEnergyCollection();
+    //this.resourceCollection[room.getName()] = room.getEnergyResourceCollection();
+
+    //this.enemyCollection[room.getName()] = room.getInvaderCollection();
+    this.towerCollection[room.getName()] = room.getTowerCollection();
+
+    //this.constructionSiteCollection[room.getName()] = room.getConstructionSiteCollection();
+    //this.repairStructureCollection[room.getName()] = room.getRepairableStructureCollection();
 };
 
 WorldController.debugInfo = function() {
