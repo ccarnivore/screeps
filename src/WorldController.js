@@ -9,8 +9,11 @@ var WorldController = {
     resourceCollection: {},
     energyCollection: {},
     towerCollection: {},
+    linkCollection: {},
 
-    storage: null
+    storage: null,
+    maxEnergy: 0,
+    currentEnergy: 0
 };
 
 WorldController.init = function() {
@@ -38,7 +41,8 @@ WorldController.measureWorld = function() {
 
         if (!discoveredRoomCollection[i]) {
             console.log('discovering room', i);
-            var playRoom = new PlayRoom(room);
+            var playRoom = new PlayRoom(room, this);
+            playRoom.initStructureCollections();
             this.measureRoom(playRoom);
 
             discoveredRoomCollection[i] = playRoom;
@@ -50,7 +54,6 @@ WorldController.measureWorld = function() {
 };
 
 WorldController.measureRoom = function(room) {
-
     this.energyCollection[room.getName()] = room.getDroppedEnergyCollection();
     var roomResourceCollection = room.getEnergyResourceCollection();
     for (var roomResource in roomResourceCollection) {
@@ -59,6 +62,7 @@ WorldController.measureRoom = function(room) {
     }
 
     this.towerCollection[room.getName()] = room.getTowerCollection();
+    this.linkCollection[room.getName()] = room.getLinkCollection();
 
     this.repairStructureCollection[room.getName()] = room.getRepairableStructureCollection();
 };
@@ -89,7 +93,12 @@ WorldController.checkCurrentLevel = function(spawn) {
  * @returns {number}
  */
 WorldController.getSpawnEnergyTotal = function(spawn) {
-    var energy = spawn.energy;
+    if (this.currentEnergy > 0) {
+        return this.currentEnergy;
+    }
+
+    this.currentEnergy = spawn.energy;
+    this.maxEnergy = spawn.energyCapacity;
     var extensionCollection = spawn.room.find(FIND_STRUCTURES, {
         filter: function(structure) {
             return (structure.structureType == STRUCTURE_EXTENSION)
@@ -97,10 +106,15 @@ WorldController.getSpawnEnergyTotal = function(spawn) {
     });
 
     for (var extension in extensionCollection) {
-        energy += extensionCollection[extension].energy;
+        this.currentEnergy += extensionCollection[extension].energy;
+        this.maxEnergy += extensionCollection[extension].energyCapacity;
     }
 
-    return energy;
+    return this.currentEnergy;
+};
+
+WorldController.getEnergyLevel = function() {
+    return (this.currentEnergy / this.maxEnergy)*100;
 };
 
 WorldController.debugInfo = function() {

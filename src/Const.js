@@ -203,12 +203,12 @@ module.exports = {
                 cost: 250
             },
             LEVEL2: {
-                pattern: [WORK, WORK, MOVE],
-                cost: 250
+                pattern: [WORK, WORK, WORK, MOVE],
+                cost: 350
             },
             LEVEL3: {
-                pattern: [WORK, WORK, MOVE],
-                cost: 250
+                pattern: [WORK, WORK, WORK, WORK, WORK, MOVE],
+                cost: 550
             }
         },
         claimer: {

@@ -2,8 +2,9 @@ var c = require('Const'),
     cache = require('Cache'),
     SourceHandler = require('SourceHandler');
 
-function PlayRoom(room) {
+function PlayRoom(room, worldCtrl) {
     this.room = room;
+    this.worldController = worldCtrl;
     this.sourceHandler = new SourceHandler(this);
 
     this.energyResourceCollection = {};
@@ -12,25 +13,66 @@ function PlayRoom(room) {
     this.repairableStructureCollection = {};
     this.droppedEnergyCollection = {};
 
-    this.storage = null
+    this.containerCollection = [];
+    this.towerCollection = [];
+    this.linkCollection = [];
+
+    this.storage = null;
+
 }
 
+/**
+ * get the rooms name
+ *
+ * @returns {*}
+ */
 PlayRoom.prototype.getName = function() {
     return this.room.name;
 };
 
-PlayRoom.prototype.getStorage = function() {
-    var storageCollection = this.room.find(FIND_MY_STRUCTURES, {
-        filter: function(structure) {
-            return structure.structureType == STRUCTURE_STORAGE
+/**
+ * gets the room controller
+ *
+ * @returns {undefined|StructureController}
+ */
+PlayRoom.prototype.getRoomController = function() {
+    return this.room.controller;
+};
+
+/**
+ * initializes the rooms structure
+ */
+PlayRoom.prototype.initStructureCollections = function() {
+    var myStructureCollection = this.room.find(FIND_MY_STRUCTURES);
+    myStructureCollection.forEach(function (currentStructure) {
+        console.log(currentStructure);
+        switch (currentStructure.structureType) {
+            case STRUCTURE_TOWER: {
+                this.towerCollection.push(currentStructure);
+                break;
+            }
+            case STRUCTURE_LINK: {
+                this.linkCollection.push(currentStructure);
+                break;
+            }
+            case STRUCTURE_STORAGE: {
+                this.storage = currentStructure;
+                break;
+            }
+            case STRUCTURE_CONTAINER: {
+                this.containerCollection.push(currentStructure);
+                break;
+            }
         }
-    });
+    }.bind(this));
+};
 
-    if (storageCollection.length > 0) {
-        this.storage = storageCollection[0];
-    }
+PlayRoom.prototype.getTowerCollection = function() {
+    return this.towerCollection;
+};
 
-    return this.storage;
+PlayRoom.prototype.getLinkCollection = function() {
+    return this.linkCollection;
 };
 
 PlayRoom.prototype.getDroppedEnergyCollection = function() {
@@ -48,19 +90,7 @@ PlayRoom.prototype.getInvaderCollection = function() {
     return this.invaderCollection;
 };
 
-PlayRoom.prototype.getTowerCollection = function() {
-    this.towerCollection = this.room.find(FIND_MY_STRUCTURES, {
-        filter: function(structure) {
-            return structure.structureType == STRUCTURE_TOWER;
-        }
-    });
-    return this.towerCollection;
-};
 
-PlayRoom.prototype.getConstructionSiteCollection = function() {
-    this.constructionSiteCollection = this.room.find(FIND_CONSTRUCTION_SITES);
-    return this.constructionSiteCollection;
-};
 
 PlayRoom.prototype.getRepairableStructureCollection = function() {
     this.repairableStructureCollection = this.room.find(FIND_STRUCTURES, {
@@ -123,7 +153,7 @@ PlayRoom.prototype.getDroppedEnergy = function(creep, maxRange) {
     }
 };
 
-PlayRoom.prototype.getTargetLinkCollection = function(creep) {
+PlayRoom.prototype.getTargetLink = function(creep) {
     var targetLinkCollection = this.room.find(FIND_STRUCTURES, {filter: function(structure) {
         return structure.structureType == STRUCTURE_LINK
             && Memory.linkHandling.targetLinkCollection[structure.id]
@@ -182,26 +212,26 @@ PlayRoom.prototype.getEnergyResource = function(creep) {
 };
 
 /**
- * finds a container for getting energy from
+ * finds a container for distribution
  *
  * @param creep
  * @returns {*}
  */
-PlayRoom.prototype.getContainer = function(creep) {
-    var storage = creep.creep.room.find(FIND_MY_STRUCTURES, {filter: function(structure) { return structure.structureType == STRUCTURE_STORAGE}});
-    if (storage) {
-        return storage[0];
+PlayRoom.prototype.getDistributionSource = function(creep) {
+    if (this.storage) {
+        return this.storage;
     }
 
-    return creep.creep.pos.findClosestByRange(
-        FIND_STRUCTURES, {
-            filter: function(structure) {
-                return ((structure.structureType == STRUCTURE_CONTAINER)
-                    && structure.store[RESOURCE_ENERGY] > 0)
-                    && structure.id != creep.remember('usedTarget');
-            }
+    var closestRange, closestContainer;
+    this.containerCollection.forEach(function(currentContainer) {
+        var currentRange = creep.creep.pos.getRangeTo(currentContainer);
+        if (!closestRange || currentRange < closestRange) {
+            closestContainer = currentContainer;
+            closestRange = currentRange;
         }
-    );
+    });
+
+    return closestContainer;
 };
 
 /**
@@ -279,6 +309,15 @@ PlayRoom.prototype.getDestinationForDistributor = function(creep) {
             }
         }
 
+        if (this.worldController.getEnergyLevel >= 80) {
+            if (a.structureType == STRUCTURE_LINK) {
+                relevanceA += 250000;
+            }
+            if (b.structureType == STRUCTURE_LINK) {
+                relevanceB += 250000;
+            }
+        }
+
         if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE) {
             relevanceA += a.store[RESOURCE_ENERGY]
         } else {
@@ -292,20 +331,13 @@ PlayRoom.prototype.getDestinationForDistributor = function(creep) {
         }
 
         return relevanceB - relevanceA;
-    });
+    }.bind(this));
 
     creep.remember('usedTarget', targets[0].id);
     return targets[0];
 };
 
-/**
- * gets the room controller
- *
- * @returns {undefined|StructureController}
- */
-PlayRoom.prototype.getRoomController = function() {
-    return this.room.controller;
-};
+
 
 /**
  * get repairable structures

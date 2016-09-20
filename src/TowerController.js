@@ -65,7 +65,7 @@ TowerController.prototype._healCreeps = function(room) {
 };
 
 TowerController.prototype._repairStructures = function(room) {
-    var towers = this.worldController.towerCollection[room.getName()] || [];
+    var towerCollection = this.worldController.towerCollection[room.getName()] || [];
     var repairableStructureCollection = room.getRepairableStructureCollection();
     if (!repairableStructureCollection) {
         return;
@@ -78,7 +78,7 @@ TowerController.prototype._repairStructures = function(room) {
         return (a.hits / (a.hitsMax / repairLevelA) - b.hits / (b.hitsMax / repairLevelB));
     });
 
-    towers.forEach(function (tower) {
+    towerCollection.forEach(function (tower) {
         if (!tower) {
             return;
         }

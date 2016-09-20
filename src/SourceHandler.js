@@ -55,7 +55,7 @@ SourceHandler.prototype.getEnergy = function(creep, resourceCtrl) {
     }
 
     if (creep.getRole() == c.CREEP_ROLE_DISTRIBUTOR) {
-        var usedContainer = this.room.getContainer(creep);
+        var usedContainer = this.room.getDistributionSource(creep);
         if (!usedContainer) {
             return ERR_INVALID_ARGS;
         }
@@ -70,9 +70,9 @@ SourceHandler.prototype.getEnergy = function(creep, resourceCtrl) {
     }
 
     if (creep.getRole() == c.CREEP_ROLE_UPGRADER) {
-        var link = this.room.getTargetLinkCollection(creep);
+        var link = this.room.getTargetLink(creep);
         if (link) {
-            return this._getEnergy(creep, STRUCTURE_LINK, creep);
+            return this._getEnergy(creep, STRUCTURE_LINK, link);
         }
     }
 

@@ -190,9 +190,7 @@ AbstractCreep._harvestEnergy = function(creep) {
     var room = this.worldController.getRoom(creep.creep.room.name),
         sourceHandler = room.sourceHandler;
 
-    console.log('abstract', '_harvestEnergy', creep.creep, room.getName(), sourceHandler);
-
-    //var res = sourceHandler.getEnergy(creep, this.resourceController);
+    console.log('abstract', '_harvestEnergy', creep.creep, room.getName());
     var res = sourceHandler.getEnergy(creep);
     switch (res) {
         case ERR_FULL: {

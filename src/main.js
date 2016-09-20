@@ -1,6 +1,7 @@
 var WorldController = require('WorldController'),
     CreepController = require('CreepController'),
     ResourceController = require('ResourceController'),
+    LinkController = require('LinkController'),
     TowerController = require('TowerController');
 
 
@@ -13,5 +14,6 @@ module.exports.loop = function() {
     //resCtrl.checkResourceBalance();
 
     new TowerController(WorldController).run();
+    new LinkController(WorldController).run();
     new CreepController(WorldController, resCtrl).run();
 };
