@@ -101,35 +101,38 @@ PlayRoom.prototype.getRepairableStructureCollection = function() {
 PlayRoom.prototype.getDroppedEnergy = function(creep, maxRange) {
     if (creep.remember('usedDroppedEnergyId')) {
         var target = Game.getObjectById(creep.remember('usedDroppedEnergyId'));
-        if (!target) {
-            creep.forget('usedDroppedEnergyId');
+        if (target) {
+            return target;
+
         }
 
-        return target;
+        creep.forget('usedDroppedEnergyId');
     }
 
     maxRange = maxRange || 4;
-    if (cache.has('droppedEnergyCollection')) {
-        var cachedResources = cache.get('droppedEnergyCollection');
-        if (creep == undefined) {
-            return cachedResources[0];
-        }
+    var targets = this.room.find(FIND_DROPPED_ENERGY, { filter: function(energy) {
+        return (creep.creep.pos.findPathTo(energy)).length <= maxRange + 2;
+    }});
+    targets.sort(function(a, b) {
+        return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
+    });
 
-        cachedResources.sort(function(a, b) {
-            return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
-        });
-
-        if (creep.creep.pos.getRangeTo(cachedResources[0]) <= maxRange) {
-            creep.remember('usedDroppedEnergyId', cachedResources[0].id);
-            return cachedResources[0];
-        }
-
-        return;
+    if (creep.creep.pos.getRangeTo(targets[0]) <= maxRange) {
+        creep.remember('usedDroppedEnergyId', targets[0].id);
+        return targets[0];
     }
+};
 
-    var targets = this.room.find(FIND_DROPPED_ENERGY);
-    cache.set('droppedEnergyCollection', targets);
-    return this.getDroppedEnergy(creep);
+PlayRoom.prototype.getTargetLinkCollection = function(creep) {
+    var targetLinkCollection = this.room.find(FIND_STRUCTURES, {filter: function(structure) {
+        return structure.structureType == STRUCTURE_LINK
+            && Memory.linkHandling.targetLinkCollection[structure.id]
+            && structure.energy > 0;
+    }});
+
+    if (targetLinkCollection.length > 0) {
+        return targetLinkCollection[0];
+    }
 };
 
 /**
@@ -146,15 +149,27 @@ PlayRoom.prototype.getEnergyResource = function(creep) {
         }
     }
 
-    if (cache.has('harvesterEnergyResourceCollection')) {
-        var cachedResources = cache.get('harvesterEnergyResourceCollection');
-        if (creep == undefined) {
-            return cachedResources[0];
-        }
+    var targets = this.room.find(FIND_SOURCES),
+        resource;
 
-        var resource = cachedResources[0];
+    if (targets.length > 1) {
         cache.setPersistence(true);
-        cache.set('lastAssignedSourceId' + creep.remember('role'), resource.id);
+        for (var targetId in targets) {
+            if (targets[targetId].id == cache.get('lastAssignedSourceId' + creep.getRole())) {
+                continue;
+            }
+
+            resource = targets[targetId];
+            break;
+        }
+        cache.setPersistence(false);
+    } else {
+        resource = targets[0];
+    }
+
+    if (resource) {
+        cache.setPersistence(true);
+        cache.set('lastAssignedSourceId' + creep.getRole(), resource.id);
         cache.setPersistence(false);
 
         console.log(creep.creep, 'set energy resource', resource, resource.pos);
@@ -164,18 +179,6 @@ PlayRoom.prototype.getEnergyResource = function(creep) {
         return resource;
     }
 
-
-    cache.setPersistence(true);
-    var targets = this.room.find(
-        FIND_SOURCES, {
-            filter: function(resource) {
-                return resource.id != cache.get('lastAssignedSourceId' + creep.remember('role'));
-            }
-    });
-    cache.setPersistence(false);
-
-    cache.set('harvesterEnergyResourceCollection', targets);
-    return this.getEnergyResource(creep);
 };
 
 /**
@@ -223,88 +226,76 @@ PlayRoom.prototype.getEnergyStorageCollection = function(creep) {
     );
 };
 
+PlayRoom.prototype._filterDistributorTarget = function(target) {
+    return (
+        target.structureType == STRUCTURE_CONTAINER
+            && target.store[RESOURCE_ENERGY] < target.storeCapacity
+        ) || (
+            (target.structureType == STRUCTURE_TOWER
+                && target.energy < target.energyCapacity)
+            || (target.structureType == STRUCTURE_EXTENSION
+                && target.energy < target.energyCapacity)
+            || (target.structureType == STRUCTURE_SPAWN
+                && target.energy < target.energyCapacity)
+            || (target.structureType == STRUCTURE_LINK
+                && target.energy < target.energyCapacity
+                && Memory.linkHandling.sourceLinkCollection[target.id]
+            )
+    );
+};
+
 PlayRoom.prototype.getDestinationForDistributor = function(creep) {
-    var renewCache = false;
-    if (creep.remember('distributionTargetId')) {
-        var target = Game.getObjectById(creep.remember('distributionTargetId'));
+    if (creep.remember('usedTarget')) {
+        var target = Game.getObjectById(creep.remember('usedTarget'));
         if (!target) {
-            creep.forget('distributionTargetId');
-        }
-
-        if (target.structureType == STRUCTURE_CONTAINER || target.structureType == STRUCTURE_STORAGE) {
-            if (target.store[RESOURCE_ENERGY] < target.storeCapacity) {
-                return target;
-            }
+            creep.forget('usedTarget');
         } else {
-            if (target.energy < target.energyCapacity) {
+            if (this._filterDistributorTarget(target)) {
                 return target;
-            }
-        }
-
-        creep.forget('distributionTargetId');
-        renewCache = true;
-    }
-
-    if (cache.has('distributorDestinationCollection') && !renewCache) {
-        var cachedTargets = cache.get('distributorDestinationCollection');
-        if (creep == undefined) {
-            return cachedTargets[0];
-        }
-
-        cachedTargets.sort(function(a, b) {
-            var relevanceA = c.DISTRIBUTION_ENERGY_RELEVANCE[a.structureType],
-                relevanceB = c.DISTRIBUTION_ENERGY_RELEVANCE[b.structureType];
-
-            if (Memory.invaderSpotted === true) {
-                if (a.structureType == STRUCTURE_TOWER) {
-                    relevanceA += 100000000;
-                }
-                if (b.structureType == STRUCTURE_TOWER) {
-                    relevanceB += 100000000;
-                }
-            }
-
-            if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE) {
-                relevanceA += a.store[RESOURCE_ENERGY]
             } else {
-                relevanceA += a.energy;
+                creep.forget('usedTarget');
             }
-
-            if (b.structureType == STRUCTURE_CONTAINER || b.structureType == STRUCTURE_STORAGE) {
-                relevanceB += b.store[RESOURCE_ENERGY]
-            } else {
-                relevanceB += b.energy;
-            }
-
-            return relevanceB - relevanceA;
-        });
-
-        for (var currentTarget in cachedTargets) {
-            if (cachedTargets[currentTarget].id == creep.remember('usedEnergyContainer')) {
-                continue;
-            }
-
-            creep.remember('distributionTargetId', cachedTargets[currentTarget].id);
-            return cachedTargets[currentTarget];
         }
-
-        return;
     }
 
     var targets = this.room.find(
         FIND_STRUCTURES, {
             filter: function(structure) {
-                return (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity)
-                    || (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity)
-                    || (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity)
-                    || (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity)
-
-            }
+                return this._filterDistributorTarget(structure)
+            }.bind(this)
         }
     );
 
-    cache.set('distributorDestinationCollection', targets);
-    return this.getDestinationForDistributor(creep);
+    targets.sort(function(a, b) {
+        var relevanceA = c.DISTRIBUTION_ENERGY_RELEVANCE[a.structureType],
+            relevanceB = c.DISTRIBUTION_ENERGY_RELEVANCE[b.structureType];
+
+        if (Memory.invaderSpotted === true) {
+            if (a.structureType == STRUCTURE_TOWER) {
+                relevanceA += 100000000;
+            }
+            if (b.structureType == STRUCTURE_TOWER) {
+                relevanceB += 100000000;
+            }
+        }
+
+        if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE) {
+            relevanceA += a.store[RESOURCE_ENERGY]
+        } else {
+            relevanceA += a.energy;
+        }
+
+        if (b.structureType == STRUCTURE_CONTAINER || b.structureType == STRUCTURE_STORAGE) {
+            relevanceB += b.store[RESOURCE_ENERGY]
+        } else {
+            relevanceB += b.energy;
+        }
+
+        return relevanceB - relevanceA;
+    });
+
+    creep.remember('usedTarget', targets[0].id);
+    return targets[0];
 };
 
 /**
@@ -323,40 +314,6 @@ PlayRoom.prototype.getRoomController = function() {
  * @returns {*}
  */
 PlayRoom.prototype.getRepairableStructure = function(creep) {
-    var renewCache = false;
-    if (creep.remember('repairStructureId') && ((creep.remember('repairStructureSet') + 100) > Game.time)) {
-        var object = Game.getObjectById(creep.remember('repairStructureId'));
-        if (object && object.hits < object.hitsMax) {
-            return object;
-        }
-
-        creep.forget('repairStructureId');
-        renewCache = true;
-    }
-
-    if (cache.has('repairStructureCollection') && !renewCache) {
-        var cachedTargets = cache.get('repairStructureCollection');
-        if (creep == undefined) {
-            return cachedTargets[0];
-        }
-
-        if (cachedTargets.length == 0) {
-            return false;
-        }
-
-        cachedTargets.sort(function(a, b) {
-            var repairLevelA = c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][a.structureType] || 1,
-                repairLevelB = c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][b.structureType] || 1;
-
-            return (a.hits / (a.hitsMax / repairLevelA) - b.hits / (b.hitsMax / repairLevelB));
-        });
-
-        var structure = cachedTargets[0];
-        creep.remember('repairStructureSet', Game.time);
-        creep.remember('repairStructureId', structure.id);
-        return structure;
-    }
-
     var targets = this.room.find(FIND_STRUCTURES, {
         filter: function(structure) {
             return (
@@ -381,8 +338,17 @@ PlayRoom.prototype.getRepairableStructure = function(creep) {
         }
     });
 
-    cache.set('repairStructureCollection', targets);
-    return this.getRepairableStructure(creep);
+    targets.sort(function(a, b) {
+        var repairLevelA = c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][a.structureType] || 1,
+            repairLevelB = c.LEVEL_DEFINITION[Memory.currentLevel]['maxRepairFactor'][b.structureType] || 1;
+
+        return (a.hits / (a.hitsMax / repairLevelA) - b.hits / (b.hitsMax / repairLevelB));
+    });
+
+    var structure = targets[0];
+    creep.remember('repairStructureSet', Game.time);
+    creep.remember('repairStructureId', structure.id);
+    return structure;
 };
 
 /**
@@ -392,30 +358,18 @@ PlayRoom.prototype.getRepairableStructure = function(creep) {
  * @returns {*}
  */
 PlayRoom.prototype.getConstructionSite = function(creep) {
-    if (cache.has('constructionSiteCollection')) {
-        var cachedTargets = cache.get('constructionSiteCollection');
-        if (creep == undefined) {
-            return cachedTargets[0];
-        }
-
-        cachedTargets.sort(function(a, b) {
-            return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
-        });
-
-        if (cachedTargets[0]) {
-            if (Game.getObjectById(cachedTargets[0].id)) {
-                return cachedTargets[0]
-            }
-        }
-    }
-
     var targets = this.room.find(FIND_CONSTRUCTION_SITES);
     if (!targets.length) {
         return false;
     }
 
-    cache.set('constructionSiteCollection', targets);
-    return this.getConstructionSite(creep);
+    targets.sort(function(a, b) {
+        return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
+    });
+
+    if (targets[0]) {
+        return targets[0];
+    }
 };
 
 /**
@@ -424,36 +378,6 @@ PlayRoom.prototype.getConstructionSite = function(creep) {
  * @returns {*}
  */
 PlayRoom.prototype.getDestinationForHarvester = function(creep) {
-    if (cache.has('harvesterDestinationCollection')) {
-        var cachedTargets = cache.get('harvesterDestinationCollection');
-        if (creep == undefined) {
-            return cachedTargets[0];
-        }
-
-        cachedTargets.sort(function(a, b) {
-            var refillRelevanceA = c.REFILL_ENERGY_RELEVANCE[a.structureType],
-                refillRelevanceB = c.REFILL_ENERGY_RELEVANCE[b.structureType];
-
-            if (a.structureType == b.structureType) {
-                if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE) {
-                    refillRelevanceA += a.store[RESOURCE_ENERGY] - (a.store[RESOURCE_ENERGY] * creep.creep.pos.getRangeTo(a));
-                } else {
-                    refillRelevanceA += a.energy - (a.energy * creep.creep.pos.getRangeTo(a));
-                }
-
-                if (b.structureType == STRUCTURE_CONTAINER || b.structureType == STRUCTURE_STORAGE) {
-                    refillRelevanceB += b.store[RESOURCE_ENERGY] - (b.store[RESOURCE_ENERGY] * creep.creep.pos.getRangeTo(b));
-                } else {
-                    refillRelevanceB += b.energy - (b.energy * creep.creep.pos.getRangeTo(b));
-                }
-            }
-
-            return refillRelevanceB - refillRelevanceA;
-        });
-
-        return cachedTargets[0];
-    }
-
     var targets = this.room.find(FIND_STRUCTURES, {
         filter: function(structure) {
             return (
@@ -462,12 +386,34 @@ PlayRoom.prototype.getDestinationForHarvester = function(creep) {
                     structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity
                 ) || (
                     structure.structureType == STRUCTURE_STORAGE && structure.store[RESOURCE_ENERGY] < structure.storeCapacity
+                ) || (
+                    Memory.invaderSpotted == true && structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity
                 )
         }
     });
 
-    cache.set('harvesterDestinationCollection', targets);
-    return this.getDestinationForHarvester(creep);
+    targets.sort(function(a, b) {
+        var refillRelevanceA = c.REFILL_ENERGY_RELEVANCE[a.structureType],
+            refillRelevanceB = c.REFILL_ENERGY_RELEVANCE[b.structureType];
+
+        if (a.structureType == b.structureType) {
+            if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE) {
+                refillRelevanceA += a.store[RESOURCE_ENERGY] - (a.store[RESOURCE_ENERGY] * creep.creep.pos.getRangeTo(a));
+            } else {
+                refillRelevanceA += a.energy - (a.energy * creep.creep.pos.getRangeTo(a));
+            }
+
+            if (b.structureType == STRUCTURE_CONTAINER || b.structureType == STRUCTURE_STORAGE) {
+                refillRelevanceB += b.store[RESOURCE_ENERGY] - (b.store[RESOURCE_ENERGY] * creep.creep.pos.getRangeTo(b));
+            } else {
+                refillRelevanceB += b.energy - (b.energy * creep.creep.pos.getRangeTo(b));
+            }
+        }
+
+        return refillRelevanceB - refillRelevanceA;
+    });
+
+    return targets[0];
 };
 
 module.exports = PlayRoom;

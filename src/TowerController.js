@@ -7,6 +7,10 @@ function TowerController(worldCtrl) {
 TowerController.prototype.run = function() {
     for (var roomName in this.worldController.roomCollection) {
         var room = this.worldController.roomCollection[roomName];
+        if (!this.worldController.towerCollection[roomName] || this.worldController.towerCollection[roomName].length == 0) {
+            continue;
+        }
+
         if (!this._defendRoom(room) && !this._healCreeps(room)) {
             this._repairStructures(room);
         }
@@ -14,7 +18,7 @@ TowerController.prototype.run = function() {
 };
 
 TowerController.prototype._defendRoom = function(room) {
-    var hostiles = this.worldController.enemyCollection;
+    var hostiles = room.getInvaderCollection();
     Memory.invaderSpotted = hostiles.length > 0;
     if (!Memory.invaderSpotted) {
         return false;
@@ -22,6 +26,10 @@ TowerController.prototype._defendRoom = function(room) {
 
     var towers = this.worldController.towerCollection[room.getName()] || [];
     towers.forEach(function (tower) {
+        if (!tower) {
+            return;
+        }
+
         var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         tower.attack(target);
     });
@@ -30,7 +38,7 @@ TowerController.prototype._defendRoom = function(room) {
 };
 
 TowerController.prototype._healCreeps = function(room) {
-    var injuredCreeps = room.room.find(FIND_CREEPS, {
+    var injuredCreeps = room.room.find(FIND_MY_CREEPS, {
         filter: function (creep) {
             return creep.hits < creep.hitsMax
         }
@@ -46,6 +54,10 @@ TowerController.prototype._healCreeps = function(room) {
 
     var towers = this.worldController.towerCollection[room.getName()] || [];
     towers.forEach(function (tower) {
+        if (!tower) {
+            return;
+        }
+
         tower.heal(injuredCreeps[0]);
     });
 
@@ -54,7 +66,7 @@ TowerController.prototype._healCreeps = function(room) {
 
 TowerController.prototype._repairStructures = function(room) {
     var towers = this.worldController.towerCollection[room.getName()] || [];
-    var repairableStructureCollection = this.worldController.repairStructureCollection[room.getName()];
+    var repairableStructureCollection = room.getRepairableStructureCollection();
     if (!repairableStructureCollection) {
         return;
     }
@@ -67,6 +79,10 @@ TowerController.prototype._repairStructures = function(room) {
     });
 
     towers.forEach(function (tower) {
+        if (!tower) {
+            return;
+        }
+
         if (tower.energy <= 100) {
             return;
         }
@@ -78,19 +94,7 @@ TowerController.prototype._repairStructures = function(room) {
             Memory.tower[tower.id] = {};
         }
 
-        if (towerData.repairObjectId && ((Game.time - towerData.repairObjectTime) < 50)) {
-            repairTarget = Game.getObjectById(towerData.repairObjectId);
-            if (repairTarget && repairTarget.hits < repairTarget.hitsMax) {
-                tower.repair(repairTarget);
-
-                return true;
-            }
-        }
-
         repairTarget = repairableStructureCollection[0];
-        Memory.tower[tower.id].repairObjectId = repairTarget.id;
-        Memory.tower[tower.id].repairObjectTime = Game.time;
-
         tower.repair(repairTarget);
     }.bind(this));
 

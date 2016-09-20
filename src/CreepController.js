@@ -7,55 +7,131 @@ var c = require('Const'),
     UpgraderCreep = require('UpgraderCreep'),
     BuilderCreep = require('BuilderCreep'),
     RepairCreep = require('RepairCreep'),
-    ScouterCreep = require('ScouterCreep');
+    ClaimerCreep = require('ClaimerCreep'),
+    RemoteMinerCreep = require('RemoteMinerCreep'),
+    RemoteHarvesterCreep = require('RemoteHarvesterCreep');
 
 
-function CreepController(worldCtrl) {
+function CreepController(worldCtrl, resourceCtrl) {
     this.worldController = worldCtrl;
+    this.resourceController = resourceCtrl;
+    this.creepCollection = [];
+
+    this.creepStats = {
+        harvester: 0,
+        miner: 0,
+        upgrader: 0,
+        builder: 0,
+        repairer: 0,
+        distributor: 0,
+        claimer: 0,
+        remoteMiner: 0,
+        remoteHarvester: 0
+    };
+    this.creepCount = 0;
+
+    this.hasUpgrader = false;
+    this.hasHarvester = false;
+    this.hasBuilder = false;
+    this.hasRepairer = false;
+    this.hasDistributor = false;
+    this.hasMiner = false;
 }
 
-CreepController.prototype.run = function() {
-    this._checkCreepPopulation();
-    this._doWork();
-    this._buryDead();
+CreepController.prototype._emergencySuicide = function() {
+    if (!Memory.lastEnergyHarvest || ((Memory.lastEnergyHarvest + 200) < Game.time)) {
+        this.creepCollection.forEach(function (creep) {
+            if (creep.remember('role') == c.CREEP_ROLE_MINER || creep.remember('role') == c.CREEP_ROLE_HARVESTER) {
+                return;
+            }
+
+            creep.creep.suicide();
+        });
+    }
 };
 
-CreepController.prototype._doWork = function() {
+CreepController.prototype.run = function() {
+    this._registerCreepCollection();
+    this._checkCreepPopulation();
+    this._doWork();
+    this._emergencySuicide();
+    this._buryDead();
+
+    console.log('creeps stats', JSON.stringify(this.creepStats));
+};
+
+CreepController.prototype._discoverCreep = function(creep) {
+    this.creepCount += 1;
+    this.creepStats[creep.remember('role')] += 1;
+    if (creep.remember('formerRole')) {
+        if (!this.creepStats[creep.remember('formerRole')]) {
+            this.creepStats[creep.remember('formerRole')] = 0;
+        }
+
+        this.creepStats[creep.remember('formerRole')] += 1;
+    }
+};
+
+CreepController.prototype._registerCreepCollection = function() {
     for (var name in Game.creeps) {
-        var creep = Game.creeps[name];
-        var wrappedCreep;
+        var creep = Game.creeps[name], wrappedCreep;
+
+        if (!creep) {
+            this._buryDead(name);
+            continue;
+        }
+
         switch (creep.memory.role) {
             case c.CREEP_ROLE_BUILDER: {
                 wrappedCreep = new BuilderCreep(creep);
+                this.hasBuilder = true;
                 break;
             }
             case c.CREEP_ROLE_REPAIRER: {
                 wrappedCreep = new RepairCreep(creep);
+                this.hasRepairer = true;
                 break;
             }
 
             case c.CREEP_ROLE_UPGRADER: {
                 wrappedCreep = new UpgraderCreep(creep);
+                this.hasUpgrader = true;
                 break;
             }
 
             case c.CREEP_ROLE_HARVESTER: {
                 wrappedCreep = new HarvesterCreep(creep);
+                this.hasHarvester = true;
+                break;
+            }
+
+            case c.CREEP_ROLE_REMOTE_HARVESTER: {
+                wrappedCreep = new RemoteHarvesterCreep(creep);
+                this.hasHarvester = true;
                 break;
             }
 
             case c.CREEP_ROLE_DISTRIBUTOR: {
                 wrappedCreep = new DistributorCreep(creep);
+                this.hasDistributor = true;
                 break;
             }
 
             case c.CREEP_ROLE_MINER: {
                 wrappedCreep = new MinerCreep(creep);
+                this.hasMiner = true;
                 break;
             }
 
-            case c.CREEP_ROLE_SCOUTER: {
-                wrappedCreep = new ScouterCreep(creep);
+            case c.CREEP_ROLE_REMOTE_MINER: {
+                wrappedCreep = new RemoteMinerCreep(creep);
+                this.hasMiner = true;
+                break;
+            }
+
+            case c.CREEP_ROLE_CLAIMER: {
+                wrappedCreep = new ClaimerCreep(creep);
+                this.hasMiner = true;
                 break;
             }
 
@@ -66,8 +142,17 @@ CreepController.prototype._doWork = function() {
 
         Util.inherit(AbstractCreep, wrappedCreep);
         wrappedCreep.setWorldController(this.worldController);
-        wrappedCreep.doWork();
+        wrappedCreep.setResourceController(this.resourceController);
+
+        this._discoverCreep(wrappedCreep);
+        this.creepCollection.push(wrappedCreep);
     }
+};
+
+CreepController.prototype._doWork = function() {
+    this.creepCollection.forEach(function (creep) {
+        creep.doWork();
+    });
 };
 
 /**
@@ -79,118 +164,50 @@ CreepController.prototype._doWork = function() {
 CreepController.prototype._checkCreepPopulation = function() {
     // temporary
     var spawn = Game.spawns['Spawn1'];
-    Memory.currentLevel = Memory.currentLevel || c.LEVEL1;
-    this._checkLevel(spawn);
-
-    var creepCount = 0;
-    var creation = { harvester: 0, miner: 0, upgrader: 0, builder: 0, distributor: 0, repairer: 0, scouter: 0 };
-    var hasUpgrader = false,
-        hasHarvester = false,
-        hasBuilder = false,
-        hasRepairer = false,
-        hasDistributor = false,
-        hasMiner = false;
-
-    for (var creepName in Game.creeps) {
-        creepCount ++;
-        var creep = Game.creeps[creepName];
-
-        if (!creep) {
-            this._buryDead(creepName);
-        }
-
-        creation[creep.memory.role] += 1;
-        switch (creep.memory.role) {
-            case c.CREEP_ROLE_HARVESTER: {
-                hasHarvester = true;
-                break;
-            }
-            case c.CREEP_ROLE_UPGRADER: {
-                hasUpgrader = true;
-                break;
-            }
-            case c.CREEP_ROLE_BUILDER: {
-                hasBuilder = true;
-                break;
-            }
-            case c.CREEP_ROLE_REPAIRER: {
-                hasRepairer = true;
-                break;
-            }
-            case c.CREEP_ROLE_DISTRIBUTOR: {
-                hasDistributor = true;
-                break;
-            }
-            case c.CREEP_ROLE_MINER: {
-                hasMiner = true;
-                break;
-            }
-        }
-    }
 
     if (!this._creationPossible(spawn)) {
         return;
     }
 
-    if (creepCount == 0 || !hasHarvester || creation.harvester < 2) {
+    if (this.creepCount == 0 || !this.hasHarvester || this.creepStats[c.CREEP_ROLE_HARVESTER] < 2) {
         this._createCreep(spawn, c.CREEP_ROLE_HARVESTER);
         return;
     }
 
-    if (!hasMiner || creation.miner < 2) {
+    if (!this.hasMiner || this.creepStats[c.CREEP_ROLE_MINER] < 2) {
         this._createCreep(spawn, c.CREEP_ROLE_MINER);
         return;
     }
 
-    if (!hasUpgrader) {
+    if (!this.hasUpgrader) {
         this._createCreep(spawn, c.CREEP_ROLE_UPGRADER);
         return;
     }
 
     var levelDefinition = c.LEVEL_DEFINITION[Memory.currentLevel];
-    if (creepCount >= c.GLOBAL_CREEP_LIMIT || creepCount >= levelDefinition.creepLimit) {
+    if (this.creepCount >= c.GLOBAL_CREEP_LIMIT || this.creepCount >= levelDefinition.creepLimit) {
         return;
     }
 
-    if (!hasRepairer) {
+    if (!this.hasRepairer) {
         this._createCreep(spawn, c.CREEP_ROLE_REPAIRER);
         return;
     }
 
-    if (!hasDistributor) {
+    if (!this.hasDistributor) {
         this._createCreep(spawn, c.CREEP_ROLE_DISTRIBUTOR);
         return;
     }
 
-    if (!hasBuilder) {
+    if (!this.hasBuilder) {
         this._createCreep(spawn, c.CREEP_ROLE_BUILDER);
         return;
     }
 
     for (var role in levelDefinition.creepInstances) {
-        if (creation[role] < levelDefinition.creepInstances[role]) {
+        if (this.creepStats[role] < levelDefinition.creepInstances[role]) {
             this._createCreep(spawn, role);
             return;
-        }
-    }
-};
-
-/**
- * checks current creeps level depends on
- * available energy
- *
- * @param spawn
- */
-CreepController.prototype._checkLevel = function(spawn) {
-    var energy = this._getCreationEnergy(spawn);
-    for (var level in c.LEVEL_DEFINITION) {
-        if (level <= Memory.currentLevel) {
-            continue;
-        }
-
-        if (energy >= c.LEVEL_DEFINITION[level].minEnergy) {
-            console.log('upgrading level to ' + level);
-            Memory.currentLevel = level;
         }
     }
 };
@@ -204,7 +221,7 @@ CreepController.prototype._checkLevel = function(spawn) {
 CreepController.prototype._createCreep = function(spawn, role) {
     console.log('try create ' + role);
     if (this._creationPossible(spawn, role)) {
-        var creationEnergy = this._getCreationEnergy(spawn),
+        var creationEnergy = this.worldController.getSpawnEnergyTotal(spawn),
             generalConstructionPlan = c.GLOBAL_BUILD_PATTERN[role],
             levelConstructionPlan = c.GLOBAL_BUILD_PATTERN[role][Memory.currentLevel],
             buildPattern = levelConstructionPlan.pattern.slice(0),
@@ -261,32 +278,12 @@ CreepController.prototype._createCreep = function(spawn, role) {
  * @returns {boolean}
  */
 CreepController.prototype._creationPossible = function(spawn, role) {
-    var energy = this._getCreationEnergy(spawn);
+    var energy = this.worldController.getSpawnEnergyTotal(spawn);
     if (role == undefined) {
         return energy >= c.MIN_CREEP_ENERGY_LEVEL;
     }
 
-    return this._getCreationEnergy(spawn) >= c.GLOBAL_BUILD_PATTERN[role][Memory.currentLevel].cost;
-};
-
-/**
- *
- * @param spawn
- * @returns {number}
- */
-CreepController.prototype._getCreationEnergy = function(spawn) {
-    var energy = spawn.energy;
-    var extensionCollection = spawn.room.find(FIND_STRUCTURES, {
-            filter: function(structure) {
-                return (structure.structureType == STRUCTURE_EXTENSION)
-            }
-    });
-
-    for (var extension in extensionCollection) {
-        energy += extensionCollection[extension].energy;
-    }
-
-    return energy;
+    return this.worldController.getSpawnEnergyTotal(spawn) >= c.GLOBAL_BUILD_PATTERN[role][Memory.currentLevel].cost;
 };
 
 CreepController.prototype._buryDead = function(creepToBury) {

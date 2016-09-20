@@ -4,24 +4,24 @@
  * @param creep
  * @constructor
  */
-function ScouterCreep(creep) {
+function ClaimerCreep(creep) {
     this.creep = creep;
 }
 
 /**
  * units main routing
  */
-ScouterCreep.prototype.doWork = function() {
-    var resourceFlag = Game.flags['R1'];
-    if (!resourceFlag) {
-        console.log('no scouting target');
+ClaimerCreep.prototype.doWork = function() {
+    var remoteFlag = Game.flags['REMOTE'];
+    if (!remoteFlag) {
         return;
     }
 
-    if (resourceFlag.pos.roomName != this.creep.pos.roomName) {
-        this._walk(resourceFlag);
+    if (this.creep.pos.roomName != remoteFlag.pos.roomName) {
+        this._walk(remoteFlag);
         return;
     }
+
 
     // claim controller
     var controller = this.creep.room.controller;
@@ -30,4 +30,4 @@ ScouterCreep.prototype.doWork = function() {
     }
 };
 
-module.exports = ScouterCreep;
+module.exports = ClaimerCreep;

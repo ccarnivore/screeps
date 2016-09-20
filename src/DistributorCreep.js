@@ -24,9 +24,7 @@ DistributorCreep.prototype.doWork = function() {
         }
 
         var target = room.getDestinationForDistributor(this);
-        console.log(this.creep, 'distribution target', target);
         if (target) {
-            this.remember('usedTarget', target.id);
             switch(this.creep.transfer(target, RESOURCE_ENERGY)) {
                 case ERR_NOT_IN_RANGE: {
                     this._walk(target);
@@ -42,6 +40,7 @@ DistributorCreep.prototype.doWork = function() {
             }
         } else {
             if (this._isFullyLoaded()) {
+                this._walk(Game.flags['RESTING']);
                 console.log(this.creep, this.remember('role'), 'resting');
                 return;
             }

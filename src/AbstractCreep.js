@@ -1,11 +1,36 @@
 var c = require('Const');
 
 var AbstractCreep = {
-    worldController: null
+    worldController: null,
+    resourceController: null
 };
 
 AbstractCreep.setWorldController = function(worldCtrl) {
     this.worldController = worldCtrl;
+};
+
+AbstractCreep.setResourceController = function(resourceCtrl) {
+    this.resourceController = resourceCtrl;
+};
+
+AbstractCreep.getRole = function(realRole) {
+    var role = this.remember('role');
+    if (realRole) {
+        return role;
+    }
+
+    switch (role) {
+        case c.CREEP_ROLE_REMOTE_HARVESTER: {
+            role = c.CREEP_ROLE_HARVESTER;
+            break;
+        }
+        case c.CREEP_ROLE_REMOTE_MINER: {
+            role = c.CREEP_ROLE_MINER;
+            break;
+        }
+    }
+
+    return role;
 };
 
 /**
@@ -38,8 +63,8 @@ AbstractCreep.forget = function(key) {
  *
  * @param newRole
  */
-AbstractCreep.morphTo = function(newRole) {
-    console.log(this.creep, this.remember('role'), 'morphing to ', newRole);
+AbstractCreep._morphTo = function(newRole) {
+    this.remember('formerRole', this.remember('role'));
     this.remember('role', newRole);
     this.forget('task');
 };
@@ -165,7 +190,11 @@ AbstractCreep._harvestEnergy = function(creep) {
     var room = this.worldController.getRoom(creep.creep.room.name),
         sourceHandler = room.sourceHandler;
 
-    switch (sourceHandler.getEnergy(creep)) {
+    console.log('abstract', '_harvestEnergy', creep.creep, room.getName(), sourceHandler);
+
+    //var res = sourceHandler.getEnergy(creep, this.resourceController);
+    var res = sourceHandler.getEnergy(creep);
+    switch (res) {
         case ERR_FULL: {
             return false;
         }
@@ -175,6 +204,17 @@ AbstractCreep._harvestEnergy = function(creep) {
         case ERR_INVALID_ARGS: {
             return !this._hasEnergy();
         }
+        case ERR_INVALID_TARGET: {
+            if (!this._hasEnergy()) {
+                this._walk(Game.flags['RESTING']);
+            }
+
+            return false;
+        }
+    }
+
+    if (creep.getRole() != c.CREEP_ROLE_MINER && creep.getRole() != c.CREEP_ROLE_HARVESTER) {
+        Memory.lastEnergyHarvest = Game.time;
     }
 
     return true;
@@ -188,7 +228,7 @@ AbstractCreep._harvestEnergy = function(creep) {
  * @private
  */
 AbstractCreep._walk = function(target) {
-    this.creep.moveTo(target);
+    this.creep.moveTo(target, {reusePath: 50});
 };
 
 module.exports = AbstractCreep;

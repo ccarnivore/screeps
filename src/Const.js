@@ -2,8 +2,10 @@ module.exports = {
     GLOBAL_CREEP_LIMIT: 30,
 
     CREEP_ROLE_HARVESTER: 'harvester',
+    CREEP_ROLE_REMOTE_HARVESTER: 'remoteHarvester',
     CREEP_ROLE_MINER: 'miner',
-    CREEP_ROLE_SCOUTER: 'scouter',
+    CREEP_ROLE_REMOTE_MINER: 'remoteMiner',
+    CREEP_ROLE_CLAIMER: 'claimer',
     CREEP_ROLE_WARRIOR: 'warrior',
     CREEP_ROLE_DISTRIBUTOR: 'distributor',
     CREEP_ROLE_BUILDER: 'builder',
@@ -29,10 +31,11 @@ module.exports = {
                 harvester: 2,
                 miner: 2,
                 distributor: 1,
-                warrior: 0,
                 repairer: 1,
                 builder: 1,
-                upgrader: 1
+                upgrader: 1,
+                remoteMiner: 0,
+                remoteHarvester: 0
             },
             maxRepairFactor: {
                 'constructedWall': 30000,
@@ -50,7 +53,9 @@ module.exports = {
                 distributor: 2,
                 builder: 2,
                 upgrader: 4,
-                repairer: 2
+                repairer: 2,
+                remoteMiner: 0,
+                remoteHarvester: 0
             },
             maxRepairFactor: {
                 'constructedWall': 1000,
@@ -61,15 +66,17 @@ module.exports = {
         },
         LEVEL3: {
             minEnergy: 700,
-            creepLimit: 20,
+            creepLimit: 24,
             creepInstances: {
                 miner: 4,
-                harvester: 4,
-                distributor: 2,
-                builder: 2,
+                harvester: 5,
+                distributor: 3,
+                builder: 1,
                 upgrader: 4,
                 repairer: 2,
-                scouter: 0
+                remoteMiner: 1,
+                remoteHarvester: 2,
+                claimer: 1,
             },
             maxRepairFactor: {
                 'constructedWall': 500,
@@ -100,6 +107,21 @@ module.exports = {
             },
         },
         harvester: {
+            extensionOrder: [CARRY, CARRY, MOVE],
+            LEVEL1: {
+                pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 300
+            },
+            LEVEL2: {
+                pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 300
+            },
+            LEVEL3: {
+                pattern: [WORK, CARRY, MOVE, CARRY, MOVE],
+                cost: 300
+            },
+        },
+        remoteHarvester: {
             extensionOrder: [CARRY, CARRY, MOVE],
             LEVEL1: {
                 pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
@@ -174,11 +196,26 @@ module.exports = {
                 cost: 250
             }
         },
-        scouter: {
+        remoteMiner: {
+            extensionOrder: [WORK, WORK, WORK, WORK],
+            LEVEL1: {
+                pattern: [WORK, WORK, MOVE],
+                cost: 250
+            },
+            LEVEL2: {
+                pattern: [WORK, WORK, MOVE],
+                cost: 250
+            },
+            LEVEL3: {
+                pattern: [WORK, WORK, MOVE],
+                cost: 250
+            }
+        },
+        claimer: {
             extensionOrder: [CLAIM, MOVE],
             LEVEL3: {
-                pattern: [CLAIM, CLAIM, MOVE, MOVE],
-                cost: 1300
+                pattern: [CLAIM, CLAIM, MOVE],
+                cost: 1250
             }
         }
     },
@@ -187,11 +224,13 @@ module.exports = {
         'spawn':        10000000,
         'extension':    7700000,
         'tower':        7600000,
-        'storage':      7500000,
-        'container':    7000000
+        'link':         7500000,
+        'container':    7400000,
+        'storage':      7300000
     },
 
     REFILL_ENERGY_RELEVANCE: {
+        'tower':        800000,
         'spawn':        300000,
         'storage':      100000,
         'container':    50000

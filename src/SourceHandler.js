@@ -21,6 +21,7 @@ SourceHandler.prototype._getEnergy = function(creep, type, target) {
             break;
         }
 
+        case STRUCTURE_LINK:
         case STRUCTURE_CONTAINER: {
             res = creep.creep.withdraw(target, RESOURCE_ENERGY);
             break;
@@ -33,7 +34,6 @@ SourceHandler.prototype._getEnergy = function(creep, type, target) {
                     res = ERR_NOT_IN_RANGE;
                 }
             }
-            console.log(creep.creep, 'harvesting', res);
             break;
         }
     }
@@ -46,15 +46,15 @@ SourceHandler.prototype._getEnergy = function(creep, type, target) {
     return res;
 };
 
-SourceHandler.prototype.getEnergy = function(creep) {
-    var energySource;
-    if (creep.remember('role') != c.CREEP_ROLE_MINER) {
+SourceHandler.prototype.getEnergy = function(creep, resourceCtrl) {
+    var energySource, resource;
+    if (creep.getRole() != c.CREEP_ROLE_MINER) {
         if (energySource = this.room.getDroppedEnergy(creep)) {
             return this._getEnergy(creep, RESOURCE_ENERGY, energySource);
         }
     }
 
-    if (creep.remember('role') == c.CREEP_ROLE_DISTRIBUTOR) {
+    if (creep.getRole() == c.CREEP_ROLE_DISTRIBUTOR) {
         var usedContainer = this.room.getContainer(creep);
         if (!usedContainer) {
             return ERR_INVALID_ARGS;
@@ -64,10 +64,16 @@ SourceHandler.prototype.getEnergy = function(creep) {
         return this._getEnergy(creep, STRUCTURE_CONTAINER, usedContainer);
     }
 
-    if (creep.remember('role') == c.CREEP_ROLE_MINER || creep.remember('role') == c.CREEP_ROLE_HARVESTER) {
-        var resource = this.room.getEnergyResource(creep);
-        console.log(creep.creep, 'got resource', resource);
+    if (creep.getRole() == c.CREEP_ROLE_MINER || creep.getRole() == c.CREEP_ROLE_HARVESTER) {
+        resource = this.room.getEnergyResource(creep);
         return this._getEnergy(creep, LOOK_SOURCES, resource);
+    }
+
+    if (creep.getRole() == c.CREEP_ROLE_UPGRADER) {
+        var link = this.room.getTargetLinkCollection(creep);
+        if (link) {
+            return this._getEnergy(creep, STRUCTURE_LINK, creep);
+        }
     }
 
     energySource = this.room.getEnergyStorageCollection(creep);

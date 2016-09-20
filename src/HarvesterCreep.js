@@ -12,7 +12,7 @@ function HarvesterCreep(creep) {
  * units main routing
  */
 HarvesterCreep.prototype.doWork = function() {
-    var room = this.worldController.getRoom(this.creep.room.name);
+    var birthRoom = this.worldController.getRoom(this.remember('birthRoom'));
 
     if (!this.remember('task')) {
         this._isHarvesting(true);
@@ -23,8 +23,7 @@ HarvesterCreep.prototype.doWork = function() {
             this._isHarvesting(true);
         }
 
-        var target = room.getDestinationForHarvester(this);
-        console.log(this.creep, 'transfer', target);
+        var target = birthRoom.getDestinationForHarvester(this);
         if (target) {
             switch(this.creep.transfer(target, RESOURCE_ENERGY)) {
                 case ERR_NOT_IN_RANGE: {
@@ -34,9 +33,6 @@ HarvesterCreep.prototype.doWork = function() {
                 case ERR_NOT_ENOUGH_RESOURCES: {
                     this._isHarvesting(true);
                     break;
-                }
-                case ERR_FULL: {
-                    return;
                 }
             }
         } else {

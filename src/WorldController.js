@@ -1,17 +1,26 @@
-var ConstructionController = require('ConstructionController'),
-    cache = require('Cache');
+var c = require('Const'),
+    cache = require('Cache'),
     PlayRoom = require('PlayRoom');
 
 var WorldController = {
     roomCollection: {},
     constructionSiteCollection: {},
-    enemyCollection: {},
     repairStructureCollection: {},
     resourceCollection: {},
     energyCollection: {},
     towerCollection: {},
 
     storage: null
+};
+
+WorldController.init = function() {
+    Memory.currentLevel = Memory.currentLevel || c.LEVEL1;
+    Memory.linkHandling = Memory.linkHandling || {};
+    Memory.linkHandling.sourceLinkCollection = Memory.linkHandling.sourceLinkCollection || {};
+    Memory.linkHandling.targetLinkCollection = Memory.linkHandling.targetLinkCollection || {};
+
+    // temporary
+    this.checkCurrentLevel(Game.spawns['Spawn1']);
 };
 
 WorldController.getRoom = function(roomName) {
@@ -41,21 +50,61 @@ WorldController.measureWorld = function() {
 };
 
 WorldController.measureRoom = function(room) {
-    //this.storage = this.storage || room.getStorage();
 
-    //this.energyCollection[room.getName()] = room.getDroppedEnergyCollection();
-    //this.resourceCollection[room.getName()] = room.getEnergyResourceCollection();
+    this.energyCollection[room.getName()] = room.getDroppedEnergyCollection();
+    var roomResourceCollection = room.getEnergyResourceCollection();
+    for (var roomResource in roomResourceCollection) {
+        var resource = roomResourceCollection[roomResource];
+        this.resourceCollection[resource.id] = resource;
+    }
 
-    //this.enemyCollection[room.getName()] = room.getInvaderCollection();
     this.towerCollection[room.getName()] = room.getTowerCollection();
 
-    //this.constructionSiteCollection[room.getName()] = room.getConstructionSiteCollection();
-    //this.repairStructureCollection[room.getName()] = room.getRepairableStructureCollection();
+    this.repairStructureCollection[room.getName()] = room.getRepairableStructureCollection();
+};
+
+/**
+ * checks current creeps level depends on
+ * available energy
+ *
+ * @param spawn
+ */
+WorldController.checkCurrentLevel = function(spawn) {
+    var energy = this.getSpawnEnergyTotal(spawn);
+    for (var level in c.LEVEL_DEFINITION) {
+        if (level <= Memory.currentLevel) {
+            continue;
+        }
+
+        if (energy >= c.LEVEL_DEFINITION[level].minEnergy) {
+            console.log('upgrading level to ' + level);
+            Memory.currentLevel = level;
+        }
+    }
+};
+
+/**
+ *
+ * @param spawn
+ * @returns {number}
+ */
+WorldController.getSpawnEnergyTotal = function(spawn) {
+    var energy = spawn.energy;
+    var extensionCollection = spawn.room.find(FIND_STRUCTURES, {
+        filter: function(structure) {
+            return (structure.structureType == STRUCTURE_EXTENSION)
+        }
+    });
+
+    for (var extension in extensionCollection) {
+        energy += extensionCollection[extension].energy;
+    }
+
+    return energy;
 };
 
 WorldController.debugInfo = function() {
     console.log('constructionSites', JSON.stringify(this.constructionSiteCollection));
-    console.log('enemies', JSON.stringify(this.enemyCollection));
     console.log('resourceCollection', JSON.stringify(this.resourceCollection));
     console.log('repairStructureCollection', JSON.stringify(this.repairStructureCollection));
     console.log('energyCollection', JSON.stringify(this.energyCollection));
