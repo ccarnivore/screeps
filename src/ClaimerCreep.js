@@ -22,7 +22,7 @@ ClaimerCreep.prototype.doWork = function() {
     }
 
     if (this.creep.pos.roomName != remoteFlag.pos.roomName) {
-        this._walk(remoteFlag);
+        this.walk(remoteFlag);
         return;
     }
 
@@ -31,12 +31,12 @@ ClaimerCreep.prototype.doWork = function() {
     var controller = this.creep.room.controller;
     if (this.creep.ticksToLive <= 40) {
         if (this.creep.claimController(controller) == ERR_NOT_IN_RANGE) {
-            this._walk(controller);
+            this.walk(controller);
         }
     }
 
     if (this.creep.reserveController(controller) == ERR_NOT_IN_RANGE) {
-        this._walk(controller);
+        this.walk(controller);
     }
 };
 

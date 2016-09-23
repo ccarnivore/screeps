@@ -1,18 +1,32 @@
-var WorldController = require('WorldController'),
-    CreepController = require('CreepController'),
-    ResourceController = require('ResourceController'),
+var c = require('Const'),
+    PlayRoom = require('PlayRoom'),
+    TowerController = require('TowerController'),
     LinkController = require('LinkController'),
-    TowerController = require('TowerController');
+    CreepController = require('CreepController');
 
+console.log('receive tick');
 
-console.log('received tick');
+Memory.currentLevel = Memory.currentLevel || {};
+Memory.linkHandling = Memory.linkHandling || {};
+Memory.linkHandling.sourceLinkCollection = Memory.linkHandling.sourceLinkCollection || {};
+Memory.linkHandling.targetLinkCollection = Memory.linkHandling.targetLinkCollection || {};
 
-WorldController.init();
-WorldController.measureWorld();
+for (var roomName in Game.rooms) {
+    var playRoom = new PlayRoom(Game.rooms[roomName]);
+    console.log('start processing', playRoom.getName());
 
-var resCtrl = new ResourceController(WorldController);
-//resCtrl.checkResourceBalance();
+    // temporary ignore rooms
+    if (!playRoom.isMyRoom()) {
+        console.log('room not under control');
+        continue;
+    }
 
-new TowerController(WorldController).run();
-new LinkController(WorldController).run();
-new CreepController(WorldController, resCtrl).run();
+    playRoom.measure();
+    new CreepController(playRoom).run();
+    new TowerController(playRoom).run();
+    new LinkController(playRoom).run();
+
+    console.log('processing ended');
+}
+
+console.log('tick ends');

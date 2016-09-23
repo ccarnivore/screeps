@@ -34,24 +34,30 @@ SourceHandler.prototype._getEnergy = function(creep, type, target) {
                     res = ERR_NOT_IN_RANGE;
                 }
             }
+
             break;
         }
     }
 
     if (res == ERR_NOT_IN_RANGE) {
-        creep._walk(target);
+        creep.walk(target);
         return true;
     }
 
     return res;
 };
 
-SourceHandler.prototype.getEnergy = function(creep, resourceCtrl) {
+SourceHandler.prototype.getEnergy = function(creep) {
     var energySource, resource;
     if (creep.getRole() != c.CREEP_ROLE_MINER) {
         if (energySource = this.room.getDroppedEnergy(creep)) {
             return this._getEnergy(creep, RESOURCE_ENERGY, energySource);
         }
+    }
+
+    if (creep.getRole() == c.CREEP_ROLE_MINER || creep.getRole() == c.CREEP_ROLE_HARVESTER) {
+        resource = this.room.getEnergySource(creep);
+        return this._getEnergy(creep, LOOK_SOURCES, resource);
     }
 
     if (creep.getRole() == c.CREEP_ROLE_DISTRIBUTOR) {
@@ -62,11 +68,6 @@ SourceHandler.prototype.getEnergy = function(creep, resourceCtrl) {
 
         creep.remember('usedEnergyContainer', usedContainer.id);
         return this._getEnergy(creep, STRUCTURE_CONTAINER, usedContainer);
-    }
-
-    if (creep.getRole() == c.CREEP_ROLE_MINER || creep.getRole() == c.CREEP_ROLE_HARVESTER) {
-        resource = this.room.getEnergyResource(creep);
-        return this._getEnergy(creep, LOOK_SOURCES, resource);
     }
 
     if (creep.getRole() == c.CREEP_ROLE_UPGRADER) {

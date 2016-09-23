@@ -11,15 +11,8 @@ function MinerCreep(creep) {
 /**
  * units main routing
  */
-MinerCreep.prototype.doWork = function() {
-    if (!this.remember('task')) {
-        this._isMining(true);
-    }
-
-    if (this._isMining()) {
-        this._harvestEnergy(this);
-    }
-
+MinerCreep.prototype._doWork = function() {
+    this._harvestEnergy(this);
 };
 
 module.exports = MinerCreep;
