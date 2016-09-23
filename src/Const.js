@@ -6,11 +6,13 @@ module.exports = {
     CREEP_ROLE_MINER: 'miner',
     CREEP_ROLE_REMOTE_MINER: 'remoteMiner',
     CREEP_ROLE_CLAIMER: 'claimer',
+    CREEP_ROLE_REMOTE_UPGRADER: 'remoteUpgrader',
     CREEP_ROLE_WARRIOR: 'warrior',
     CREEP_ROLE_DISTRIBUTOR: 'distributor',
     CREEP_ROLE_BUILDER: 'builder',
     CREEP_ROLE_UPGRADER: 'upgrader',
     CREEP_ROLE_REPAIRER: 'repairer',
+    CREEP_ROLE_REMOTE_GUARD: 'remoteGuard',
 
     CREEP_TASK_HARVESTING: 'harvesting',
     CREEP_TASK_MINING: 'mining',
@@ -66,7 +68,7 @@ module.exports = {
         },
         LEVEL3: {
             minEnergy: 700,
-            creepLimit: 24,
+            creepLimit: 30,
             creepInstances: {
                 miner: 4,
                 harvester: 5,
@@ -75,7 +77,8 @@ module.exports = {
                 upgrader: 4,
                 repairer: 2,
                 remoteMiner: 1,
-                remoteHarvester: 2,
+                remoteHarvester: 4,
+                remoteUpgrader: 0,
                 claimer: 1,
             },
             maxRepairFactor: {
@@ -137,6 +140,21 @@ module.exports = {
             },
         },
         upgrader: {
+            extensionOrder: [WORK, CARRY, WORK, CARRY, MOVE],
+            LEVEL1: {
+                pattern: [WORK, CARRY, MOVE],
+                cost: 200
+            },
+            LEVEL2: {
+                pattern: [WORK, CARRY, MOVE],
+                cost: 200
+            },
+            LEVEL3: {
+                pattern: [WORK, CARRY, MOVE],
+                cost: 200
+            }
+        },
+        remoteUpgrader: {
             extensionOrder: [WORK, CARRY, WORK, CARRY, MOVE],
             LEVEL1: {
                 pattern: [WORK, CARRY, MOVE],
@@ -223,8 +241,8 @@ module.exports = {
     DISTRIBUTION_ENERGY_RELEVANCE: {
         'spawn':        10000000,
         'extension':    7700000,
-        'tower':        7600000,
-        'link':         7500000,
+        'link':         7600000,
+        'tower':        7500000,
         'container':    7400000,
         'storage':      7300000
     },

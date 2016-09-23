@@ -1,5 +1,5 @@
 var c = require('Const'),
-    cache = require('Cache'),
+    cache = require('HastyCache'),
     PlayRoom = require('PlayRoom');
 
 var WorldController = {
@@ -21,6 +21,17 @@ WorldController.init = function() {
     Memory.linkHandling = Memory.linkHandling || {};
     Memory.linkHandling.sourceLinkCollection = Memory.linkHandling.sourceLinkCollection || {};
     Memory.linkHandling.targetLinkCollection = Memory.linkHandling.targetLinkCollection || {};
+
+    var remoteFlag = Game.flags['REMOTE'];
+    if (remoteFlag) {
+        Memory.remoteFlag = {
+            mine: remoteFlag.room.controller.my
+        };
+    } else {
+        if (Memory.remoteFlag) {
+            delete Memory.remoteFlag;
+        }
+    }
 
     // temporary
     this.checkCurrentLevel(Game.spawns['Spawn1']);
@@ -93,10 +104,6 @@ WorldController.checkCurrentLevel = function(spawn) {
  * @returns {number}
  */
 WorldController.getSpawnEnergyTotal = function(spawn) {
-    if (this.currentEnergy > 0) {
-        return this.currentEnergy;
-    }
-
     this.currentEnergy = spawn.energy;
     this.maxEnergy = spawn.energyCapacity;
     var extensionCollection = spawn.room.find(FIND_STRUCTURES, {
@@ -110,6 +117,7 @@ WorldController.getSpawnEnergyTotal = function(spawn) {
         this.maxEnergy += extensionCollection[extension].energyCapacity;
     }
 
+    console.log('getSpawnEnergyTotal', this.currentEnergy);
     return this.currentEnergy;
 };
 

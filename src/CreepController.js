@@ -8,6 +8,7 @@ var c = require('Const'),
     BuilderCreep = require('BuilderCreep'),
     RepairCreep = require('RepairCreep'),
     ClaimerCreep = require('ClaimerCreep'),
+    RemoteUpgraderCreep = require('RemoteMinerCreep'),
     RemoteMinerCreep = require('RemoteMinerCreep'),
     RemoteHarvesterCreep = require('RemoteHarvesterCreep');
 
@@ -25,6 +26,7 @@ function CreepController(worldCtrl, resourceCtrl) {
         repairer: 0,
         distributor: 0,
         claimer: 0,
+        remoteUpgrader: 0,
         remoteMiner: 0,
         remoteHarvester: 0
     };
@@ -135,6 +137,12 @@ CreepController.prototype._registerCreepCollection = function() {
                 break;
             }
 
+            case c.CREEP_ROLE_REMOTE_UPGRADER: {
+                wrappedCreep = new RemoteUpgraderCreep(creep);
+                this.hasMiner = true;
+                break;
+            }
+
             default: {
                 continue;
             }
@@ -206,6 +214,10 @@ CreepController.prototype._checkCreepPopulation = function() {
 
     for (var role in levelDefinition.creepInstances) {
         if (this.creepStats[role] < levelDefinition.creepInstances[role]) {
+            if (role == c.CREEP_ROLE_CLAIMER && (!Memory.remoteFlag || Memory.remoteFlag.mine)) {
+                continue;
+            }
+
             this._createCreep(spawn, role);
             return;
         }

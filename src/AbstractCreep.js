@@ -187,8 +187,13 @@ AbstractCreep._isRepairing = function(startRepairing) {
  * @private
  */
 AbstractCreep._harvestEnergy = function(creep) {
-    var room = this.worldController.getRoom(creep.creep.room.name),
-        sourceHandler = room.sourceHandler;
+    var room = this.worldController.getRoom(creep.creep.room.name);
+    if (!room) {
+        console.log('cannot read room ' + creep.creep.room.name);
+        return;
+    }
+
+    var sourceHandler = room.sourceHandler;
 
     console.log('abstract', '_harvestEnergy', creep.creep, room.getName());
     var res = sourceHandler.getEnergy(creep);

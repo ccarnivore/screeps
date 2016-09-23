@@ -6,14 +6,13 @@ var WorldController = require('WorldController'),
 
 
 console.log('received tick');
+
 WorldController.init();
 WorldController.measureWorld();
 
-module.exports.loop = function() {
-    var resCtrl = new ResourceController(WorldController);
-    //resCtrl.checkResourceBalance();
+var resCtrl = new ResourceController(WorldController);
+//resCtrl.checkResourceBalance();
 
-    new TowerController(WorldController).run();
-    new LinkController(WorldController).run();
-    new CreepController(WorldController, resCtrl).run();
-};
+new TowerController(WorldController).run();
+new LinkController(WorldController).run();
+new CreepController(WorldController, resCtrl).run();

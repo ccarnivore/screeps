@@ -1,43 +1,40 @@
-var Cache = {
+var HastyCache = {
     _cache: {},
     _persistence: false
 };
 
-Cache.setPersistence = function(state) {
+HastyCache.setPersistence = function(state) {
     this._persistence = state;
 };
 
-Cache.has = function(key) {
-    if (this._persistence) {
-        return Memory[key] !== undefined;
-    }
-
+HastyCache.has = function(key) {
     return this._cache[key] !== undefined;
 };
 
-Cache.set = function(key, value) {
-    if (this._persistence) {
+HastyCache.set = function(key, value, useMemory) {
+    if (useMemory) {
         Memory[key] = value;
     } else {
         this._cache[key] = value;
     }
+
     return this;
 };
 
-Cache.get = function(key) {
-    if (this._persistence) {
+HastyCache.get = function(key, useMemory) {
+    if (useMemory) {
         return Memory[key];
     }
 
     return this._cache[key];
 };
 
-Cache.remove = function(key) {
-    if (this._persistence) {
+HastyCache.remove = function(key, useMemory) {
+    if (useMemory) {
         return delete Memory[key];
     }
 
     return delete this._cache[key];
 };
 
-module.exports = Cache;
+module.exports = HastyCache;

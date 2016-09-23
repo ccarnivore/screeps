@@ -1,5 +1,5 @@
 var c = require('Const'),
-    cache = require('Cache'),
+    cache = require('HastyCache'),
     SourceHandler = require('SourceHandler');
 
 function PlayRoom(room, worldCtrl) {
@@ -45,7 +45,6 @@ PlayRoom.prototype.getRoomController = function() {
 PlayRoom.prototype.initStructureCollections = function() {
     var myStructureCollection = this.room.find(FIND_MY_STRUCTURES);
     myStructureCollection.forEach(function (currentStructure) {
-        console.log(currentStructure);
         switch (currentStructure.structureType) {
             case STRUCTURE_TOWER: {
                 this.towerCollection.push(currentStructure);
@@ -179,28 +178,25 @@ PlayRoom.prototype.getEnergyResource = function(creep) {
         }
     }
 
+    console.log('get resources for ' + creep.creep + ' in room ' + this.room);
     var targets = this.room.find(FIND_SOURCES),
         resource;
 
     if (targets.length > 1) {
-        cache.setPersistence(true);
         for (var targetId in targets) {
-            if (targets[targetId].id == cache.get('lastAssignedSourceId' + creep.getRole())) {
+            if (targets[targetId].id == cache.get('lastAssignedSourceId' + creep.getRole(), true)) {
                 continue;
             }
 
             resource = targets[targetId];
             break;
         }
-        cache.setPersistence(false);
     } else {
         resource = targets[0];
     }
 
     if (resource) {
-        cache.setPersistence(true);
-        cache.set('lastAssignedSourceId' + creep.getRole(), resource.id);
-        cache.setPersistence(false);
+        cache.set('lastAssignedSourceId' + creep.getRole(), resource.id, true);
 
         console.log(creep.creep, 'set energy resource', resource, resource.pos);
         creep.remember('usedSourceSet', Game.time);
@@ -306,15 +302,6 @@ PlayRoom.prototype.getDestinationForDistributor = function(creep) {
             }
             if (b.structureType == STRUCTURE_TOWER) {
                 relevanceB += 100000000;
-            }
-        }
-
-        if (this.worldController.getEnergyLevel >= 80) {
-            if (a.structureType == STRUCTURE_LINK) {
-                relevanceA += 250000;
-            }
-            if (b.structureType == STRUCTURE_LINK) {
-                relevanceB += 250000;
             }
         }
 
