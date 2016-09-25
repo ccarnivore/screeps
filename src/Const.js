@@ -3,6 +3,7 @@ module.exports = {
 
     CREEP_ROLE_HARVESTER: 'harvester',
     CREEP_ROLE_MINER: 'miner',
+    CREEP_ROLE_CLAIMER: 'claimer',
     CREEP_ROLE_DISTRIBUTOR: 'distributor',
     CREEP_ROLE_BUILDER: 'builder',
     CREEP_ROLE_UPGRADER: 'upgrader',
@@ -18,14 +19,14 @@ module.exports = {
     LEVEL_DEFINITION: {
         LEVEL1: {
             minEnergy: 0,
-            creepLimit: 9,
+            creepLimit: 12,
             creepInstances: {
-                harvester: 2,
+                harvester: 4,
                 miner: 2,
                 distributor: 1,
                 repairer: 1,
-                builder: 1,
-                upgrader: 1
+                builder: 2,
+                upgrader: 2
             },
             maxRepairFactor: {
                 'constructedWall': 30000,
@@ -38,7 +39,7 @@ module.exports = {
             minEnergy: 400,
             creepLimit: 18,
             creepInstances: {
-                miner: 4,
+                miner: 2,
                 harvester: 4,
                 distributor: 2,
                 builder: 2,
@@ -57,11 +58,12 @@ module.exports = {
             creepLimit: 30,
             creepInstances: {
                 miner: 4,
-                harvester: 5,
+                harvester: 8,
                 distributor: 3,
                 builder: 1,
                 upgrader: 4,
                 repairer: 2,
+                claimer: 2,
             },
             maxRepairFactor: {
                 'constructedWall': 500,
@@ -164,6 +166,21 @@ module.exports = {
             LEVEL3: {
                 pattern: [WORK, WORK, MOVE],
                 cost: 250
+            }
+        },
+        claimer: {
+            extensionOrder: [MOVE, CLAIM, CLAIM],
+            LEVEL1: {
+                pattern: [MOVE, CLAIM, CLAIM],
+                cost: 1250
+            },
+            LEVEL2: {
+                pattern: [MOVE, CLAIM, CLAIM],
+                cost: 1250
+            },
+            LEVEL3: {
+                pattern: [MOVE, CLAIM, CLAIM],
+                cost: 1250
             }
         },
     },

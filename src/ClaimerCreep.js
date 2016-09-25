@@ -11,30 +11,15 @@ function ClaimerCreep(creep) {
 /**
  * units main routing
  */
-ClaimerCreep.prototype.doWork = function() {
-    if (!Memory.remoteFlag || Memory.remoteFlag.mine) {
-        this.creep.suicide();
-    }
-
-    var remoteFlag = Game.getObjectById(Memory.remoteFlag.id);
-    if (!remoteFlag) {
-        return;
-    }
-
+ClaimerCreep.prototype._doWork = function() {
+    var remoteFlag = Game.flags['REMOTE'];
     if (this.creep.pos.roomName != remoteFlag.pos.roomName) {
         this.walk(remoteFlag);
         return;
     }
 
-
     // claim controller
     var controller = this.creep.room.controller;
-    if (this.creep.ticksToLive <= 40) {
-        if (this.creep.claimController(controller) == ERR_NOT_IN_RANGE) {
-            this.walk(controller);
-        }
-    }
-
     if (this.creep.reserveController(controller) == ERR_NOT_IN_RANGE) {
         this.walk(controller);
     }

@@ -3,6 +3,7 @@ var Util = require('Util'),
     AbstractCreep = require('AbstractCreep'),
     HarvesterCreep = require('HarvesterCreep'),
     MinerCreep = require('MinerCreep'),
+    ClaimerCreep = require('ClaimerCreep'),
     DistributorCreep = require('DistributorCreep'),
     UpgraderCreep = require('UpgraderCreep'),
     BuilderCreep = require('BuilderCreep'),
@@ -18,7 +19,7 @@ function CreepController(playRoom) {
     this.playRoom = playRoom;
     this.creepCount = 0;
 
-    this.creepStats = { harvester: 0, miner: 0, upgrader: 0, builder: 0, repairer: 0, distributor: 0 };
+    this.creepStats = { harvester: 0, miner: 0, upgrader: 0, builder: 0, repairer: 0, distributor: 0, claimer: 0 };
 
     this.hasUpgrader = false;
     this.hasHarvester = false;
@@ -35,9 +36,11 @@ function CreepController(playRoom) {
  */
 CreepController.prototype.run = function() {
     this._censusCreepPopulation();
-    this._populateRoom();
-    this._doWork();
+    if (this.playRoom.isMyRoom()) {
+        this._populateRoom();
+    }
 
+    this._doWork();
     this._buryDead();
 
     console.log('creepsStats', this.playRoom.getName(), JSON.stringify(this.creepStats));
@@ -104,6 +107,12 @@ CreepController.prototype._censusCreepPopulation = function() {
                 break;
             }
 
+            case c.CREEP_ROLE_CLAIMER: {
+                wrappedCreep = new ClaimerCreep(creep);
+                this.hasMiner = true;
+                break;
+            }
+
             default: {
                 return;
             }
@@ -126,18 +135,21 @@ CreepController.prototype._censusCreepPopulation = function() {
 CreepController.prototype._populateRoom = function() {
     var levelDefinition = c.LEVEL_DEFINITION[this.playRoom.getPlayRoomLevel()];
     if (this.creepCount == 0 || !this.hasHarvester || this.creepStats[c.CREEP_ROLE_HARVESTER] < 2) {
-        this._createCreep(c.CREEP_ROLE_HARVESTER);
-        return;
+        if (this._createCreep(c.CREEP_ROLE_HARVESTER)) {
+            return;
+        }
     }
 
     if (!this.hasMiner || this.creepStats[c.CREEP_ROLE_MINER] < 2) {
-        this._createCreep(c.CREEP_ROLE_MINER);
-        return;
+        if (this._createCreep(c.CREEP_ROLE_MINER)) {
+            return;
+        }
     }
 
     if (!this.hasUpgrader) {
-        this._createCreep(c.CREEP_ROLE_UPGRADER);
-        return;
+        if (this._createCreep(c.CREEP_ROLE_UPGRADER)) {
+            return;
+        }
     }
 
 
@@ -146,24 +158,22 @@ CreepController.prototype._populateRoom = function() {
     }
 
     if (!this.hasBuilder) {
-        this._createCreep(c.CREEP_ROLE_BUILDER);
-        return;
-    }
-
-    if (!this.hasDistributor) {
-        this._createCreep(c.CREEP_ROLE_DISTRIBUTOR);
-        return;
+        if (this._createCreep(c.CREEP_ROLE_BUILDER)) {
+            return;
+        }
     }
 
     if (!this.hasRepairer) {
-        this._createCreep(c.CREEP_ROLE_REPAIRER);
-        return;
+        if (this._createCreep(c.CREEP_ROLE_REPAIRER)) {
+            return;
+        }
     }
 
     for (var role in levelDefinition.creepInstances) {
         if (this.creepStats[role] < levelDefinition.creepInstances[role]) {
-            this._createCreep(role);
-            return;
+            if (this._createCreep(role)) {
+                return;
+            }
         }
     }
 };
@@ -174,12 +184,19 @@ CreepController.prototype._populateRoom = function() {
  * @param role
  */
 CreepController.prototype._createCreep = function(role) {
+    console.log('creepCtrl::_createCreep', role);
     if (role == c.CREEP_ROLE_DISTRIBUTOR) {
         if (this.playRoom.extensionCollection.length == 0 || (!this.playRoom.storage && this.playRoom.containerCollection.length == 0)) {
             return;
         }
-
     }
+
+    if (role == c.CREEP_ROLE_CLAIMER) {
+        if (!Game.flags['REMOTE']) {
+            return;
+        }
+    }
+
     if (this._creationPossible(role)) {
         var creationEnergy = this.playRoom.getSpawnEnergyTotal(),
             generalConstructionPlan = c.GLOBAL_BUILD_PATTERN[role],
@@ -221,6 +238,8 @@ CreepController.prototype._createCreep = function(role) {
         var spawn = this.playRoom.getSpawn();
         var spawnResult = spawn.createCreep(buildPattern, null, {role: role, birthRoom: spawn.room.name});
         console.log('creepController::_createCreep::spawn result', spawnResult);
+
+        return spawnResult;
     } else {
         console.log('creepController::_createCreep::spawning failed - no energy', role);
     }

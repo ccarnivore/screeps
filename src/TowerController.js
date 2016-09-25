@@ -11,8 +11,8 @@ TowerController.prototype.run = function() {
 };
 
 TowerController.prototype._defendRoom = function() {
-    Memory.invaderSpotted = this.playRoom.invaderCollection.length > 0;
-    if (!Memory.invaderSpotted) {
+    Memory.invaderSpotted[this.playRoom.getName()] = this.playRoom.invaderCollection.length > 0;
+    if (!Memory.invaderSpotted[this.playRoom.getName()]) {
         return false;
     }
 

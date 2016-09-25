@@ -40,6 +40,10 @@ PlayRoom.prototype.getName = function() {
     return this.room.name;
 };
 
+PlayRoom.prototype.getStats = function() {
+    return this.energySourceCollection;
+};
+
 /**
  * gets the room controller
  *
@@ -59,14 +63,11 @@ PlayRoom.prototype.isMyRoom = function() {
 };
 
 /**
- * gets the current level of the play room
- * level depends on available energy
+ * checks the current playroom level
+ * and upgrades it if necessary
  *
- * @returns {*}
  */
-PlayRoom.prototype.getPlayRoomLevel = function() {
-    Memory.currentLevel[this.getName()] = Memory.currentLevel[this.getName()] || c.LEVEL1;
-
+PlayRoom.prototype.checkPlayRoomLevel = function() {
     var energy = this.getSpawnEnergyTotal();
     for (var level in c.LEVEL_DEFINITION) {
         if (level <= Memory.currentLevel[this.getName()]) {
@@ -78,8 +79,16 @@ PlayRoom.prototype.getPlayRoomLevel = function() {
             Memory.currentLevel[this.getName()] = level;
         }
     }
+};
 
-
+/**
+ * gets the current level of the play room
+ * level depends on available energy
+ *
+ * @returns {*}
+ */
+PlayRoom.prototype.getPlayRoomLevel = function() {
+    Memory.currentLevel[this.getName()] = Memory.currentLevel[this.getName()] || c.LEVEL1;
     return Memory.currentLevel[this.getName()];
 };
 
@@ -202,6 +211,10 @@ PlayRoom.prototype.measure = function() {
 
         return (a.hits / (a.hitsMax / repairLevelA) - b.hits / (b.hitsMax / repairLevelB));
     }.bind(this));
+
+    if (this.isMyRoom()) {
+        this.checkPlayRoomLevel();
+    }
 };
 
 /**
@@ -209,10 +222,26 @@ PlayRoom.prototype.measure = function() {
  *
  * @returns {*}
  */
-PlayRoom.prototype.getTowerForRefill = function() {
+PlayRoom.prototype.getTowerForRefill = function(factor) {
+    factor = factor || 1;
     for (var towerId in this.towerCollection) {
-        if (this.towerCollection[towerId].energy < this.towerCollection[towerId].energyCapacity) {
+        if (this.towerCollection[towerId].energy < (this.towerCollection[towerId].energyCapacity / factor)) {
             return this.towerCollection[towerId];
+        }
+    }
+};
+
+/**
+ * find a tower to bring energy to
+ *
+ * @returns {*}
+ */
+PlayRoom.prototype.getLinkForRefill = function(factor) {
+    factor = factor || 1;
+    for (var linkId in this.linkCollection) {
+        var link = this.linkCollection[linkId];
+        if (link.energy < (link.energyCapacity / factor) && Memory.linkHandling.sourceLinkCollection[link.id]) {
+            return link;
         }
     }
 };
@@ -244,7 +273,7 @@ PlayRoom.prototype.getDestinationForHarvester = function() {
     }
 
     var spawn = this.getSpawn();
-    if (spawn.energy < spawn.energyCapacity) {
+    if (spawn && spawn.energy < spawn.energyCapacity) {
         return spawn;
     }
 
@@ -259,7 +288,7 @@ PlayRoom.prototype.getDestinationForHarvester = function() {
         }
     }
 
-    return this.getTowerForRefill();
+    return this.getTowerForRefill(2);
 };
 
 /**
@@ -339,7 +368,21 @@ PlayRoom.prototype.getEnergySource = function(creep) {
  * @returns {*}
  */
 PlayRoom.prototype.getConstructionSite = function(creep) {
+    if (creep.remember('constructionSiteId')) {
+        var target = Game.getObjectById(creep.remember('constructionSiteId'));
+        if (target) {
+            return target;
+        } else {
+            creep.forget('constructionSiteId');
+        }
+    }
+
     if (this.constructionSiteCollection.length > 0) {
+        this.constructionSiteCollection.sort(function(a, b) {
+            return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
+        });
+
+        creep.remember('constructionSiteId', this.constructionSiteCollection[0].id)
         return this.constructionSiteCollection[0];
     }
 };
@@ -413,11 +456,14 @@ PlayRoom.prototype.getDistributionTarget = function(creep) {
         }
     }
 
-    for (var linkId in this.linkCollection) {
-        var link = this.linkCollection[linkId];
-        if (link.energy < (link.energyCapacity / 2) && Memory.linkHandling.sourceLinkCollection[link.id]) {
-            return link;
-        }
+    var tower = this.getTowerForRefill(2);
+    if (tower) {
+        return tower;
+    }
+
+    var link = this.getLinkForRefill(2);
+    if (link) {
+        return link;
     }
 
     if (this.storage) {
@@ -431,6 +477,11 @@ PlayRoom.prototype.getDistributionTarget = function(creep) {
     var tower = this.getTowerForRefill();
     if (tower) {
         return tower;
+    }
+
+    var link = this.getLinkForRefill();
+    if (link) {
+        return link;
     }
 
     if (this.storage) {
@@ -479,12 +530,8 @@ PlayRoom.prototype.getEnergyStorageCollection = function(creep) {
         }
     }
 
-    if (this.storage && this.storage.store[RESOURCE_ENERGY] > 0) {
-        return this.storage;
-    }
-
     var spawn = this.getSpawn();
-    if (spawn.energy == spawn.energyCapacity) {
+    if (spawn && spawn.energy == spawn.energyCapacity) {
         return spawn;
     }
 };

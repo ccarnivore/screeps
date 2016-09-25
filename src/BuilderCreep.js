@@ -16,24 +16,17 @@ function BuilderCreep(creep) {
 BuilderCreep.prototype._doWork = function() {
     var target = this.getRoom().getConstructionSite(this);
     if (target) {
-        switch(this.creep.build(target)) {
+        var res = this.creep.build(target);
+        switch(res) {
             case ERR_NOT_IN_RANGE: {
                 this.walk(target);
                 break;
             }
-        }
-    } else {
-        if (this._isFullyLoaded()) {
-            if (this.getRoom().getName() != this.remember('birthRoom')) {
-                var exitDir = this.getRoom().room.findExitTo(this.remember('birthRoom'));
-                var exit = this.creep.pos.findClosestByRange(exitDir);
-                this.walk(exit);
+            case ERR_INVALID_TARGET: {
+                this.forget('constructionSiteId');
+                break;
             }
-
-            return;
         }
-
-        this._isHarvesting(true);
     }
 };
 
