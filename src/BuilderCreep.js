@@ -27,6 +27,8 @@ BuilderCreep.prototype._doWork = function() {
                 break;
             }
         }
+    } else {
+        this.morphRole(c.CREEP_ROLE_HARVESTER);
     }
 };
 

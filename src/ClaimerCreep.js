@@ -19,8 +19,16 @@ ClaimerCreep.prototype._doWork = function() {
     }
 
     // claim controller
-    var controller = this.creep.room.controller;
-    if (this.creep.reserveController(controller) == ERR_NOT_IN_RANGE) {
+    var controller = this.creep.room.controller,
+        res;
+
+    if (Memory.roomCount < Game.gcl.level) {
+        res = this.creep.claimController(controller);
+    } else {
+        res = this.creep.reserveController(controller);
+    }
+
+    if (res == ERR_NOT_IN_RANGE) {
         this.walk(controller);
     }
 };

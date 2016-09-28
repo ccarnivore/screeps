@@ -1,3 +1,4 @@
+var c = require('Const');
 /**
  * units constructor
  *
@@ -21,12 +22,7 @@ RepairCreep.prototype._doWork = function() {
             }
         }
     } else {
-        // nothing to do and fully charged
-        if (this._isFullyLoaded()) {
-            return;
-        }
-
-        this._isHarvesting(true);
+        this.morphRole(c.CREEP_ROLE_HARVESTER);
     }
 };
 

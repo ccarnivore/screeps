@@ -7,6 +7,9 @@ var Util = require('Util'),
     DistributorCreep = require('DistributorCreep'),
     UpgraderCreep = require('UpgraderCreep'),
     BuilderCreep = require('BuilderCreep'),
+    DevelopmentAidWorkerCreep = require('DevelopmentAidWorkerCreep'),
+    WarriorCreep = require('WarriorCreep'),
+    HealerCreep = require('HealerCreep'),
     RepairCreep = require('RepairCreep');
 
 /**
@@ -19,13 +22,17 @@ function CreepController(playRoom) {
     this.playRoom = playRoom;
     this.creepCount = 0;
 
-    this.creepStats = { harvester: 0, miner: 0, upgrader: 0, builder: 0, repairer: 0, distributor: 0, claimer: 0 };
+    this.creepStats = {
+        harvester: 0, miner: 0, upgrader: 0,
+        builder: 0, repairer: 0, distributor: 0,
+        claimer: 0, developmentAidWorker: 0, warrior: 0,
+        healer: 0
+    };
 
     this.hasUpgrader = false;
     this.hasHarvester = false;
     this.hasBuilder = false;
     this.hasRepairer = false;
-    this.hasDistributor = false;
     this.hasMiner = false;
 
     this.wrappedCreepCollection = [];
@@ -43,7 +50,7 @@ CreepController.prototype.run = function() {
     this._doWork();
     this._buryDead();
 
-    console.log('creepsStats', this.playRoom.getName(), JSON.stringify(this.creepStats));
+    console.log('creepsStats', this.playRoom.getName(), this.creepCount, JSON.stringify(this.creepStats));
 };
 
 /**
@@ -53,7 +60,25 @@ CreepController.prototype.run = function() {
  */
 CreepController.prototype._doWork = function() {
     this.wrappedCreepCollection.forEach(function(wrappedCreep) {
-        wrappedCreep.doWork();
+        switch (wrappedCreep.getRole()) {
+            case c.CREEP_ROLE_HARVESTER:
+            case c.CREEP_ROLE_MINER:
+            case c.CREEP_ROLE_CLAIMER:
+            case c.CREEP_ROLE_DISTRIBUTOR:
+            case c.CREEP_ROLE_BUILDER:
+            case c.CREEP_ROLE_DEVELOPMENT_AID_WORKER:
+            case c.CREEP_ROLE_UPGRADER:
+            case c.CREEP_ROLE_REPAIRER: {
+                wrappedCreep.doWork();
+                break;
+            }
+            case c.CREEP_ROLE_WARRIOR:
+            case c.CREEP_ROLE_HEALER: {
+                console.log(wrappedCreep.creep, 'playing war');
+                wrappedCreep.playWar();
+                break;
+            }
+        }
     });
 };
 
@@ -97,7 +122,6 @@ CreepController.prototype._censusCreepPopulation = function() {
 
             case c.CREEP_ROLE_DISTRIBUTOR: {
                 wrappedCreep = new DistributorCreep(creep);
-                this.hasDistributor = true;
                 break;
             }
 
@@ -107,9 +131,23 @@ CreepController.prototype._censusCreepPopulation = function() {
                 break;
             }
 
+            case c.CREEP_ROLE_DEVELOPMENT_AID_WORKER: {
+                wrappedCreep = new DevelopmentAidWorkerCreep(creep);
+                break;
+            }
+
             case c.CREEP_ROLE_CLAIMER: {
                 wrappedCreep = new ClaimerCreep(creep);
-                this.hasMiner = true;
+                break;
+            }
+
+            case c.CREEP_ROLE_WARRIOR: {
+                wrappedCreep = new WarriorCreep(creep);
+                break;
+            }
+
+            case c.CREEP_ROLE_HEALER: {
+                wrappedCreep = new HealerCreep(creep);
                 break;
             }
 
@@ -120,6 +158,20 @@ CreepController.prototype._censusCreepPopulation = function() {
 
         Util.inherit(AbstractCreep, wrappedCreep);
         wrappedCreep.setPlayRoom(this.playRoom);
+        wrappedCreep.revertMorph();
+
+        if (wrappedCreep.remember('formerRole')) {
+            switch (wrappedCreep.remember('formerRole')) {
+                case c.CREEP_ROLE_BUILDER: {
+                    this.hasBuilder = true;
+                    break;
+                }
+                case c.CREEP_ROLE_REPAIRER: {
+                    this.hasRepairer = true;
+                    break;
+                }
+            }
+        }
 
         this._discoverCreep(wrappedCreep);
         this.wrappedCreepCollection.push(wrappedCreep);
@@ -135,46 +187,49 @@ CreepController.prototype._censusCreepPopulation = function() {
 CreepController.prototype._populateRoom = function() {
     var levelDefinition = c.LEVEL_DEFINITION[this.playRoom.getPlayRoomLevel()];
     if (this.creepCount == 0 || !this.hasHarvester || this.creepStats[c.CREEP_ROLE_HARVESTER] < 2) {
-        if (this._createCreep(c.CREEP_ROLE_HARVESTER)) {
-            return;
-        }
+        this._createCreep(c.CREEP_ROLE_HARVESTER);
+        return;
     }
 
     if (!this.hasMiner || this.creepStats[c.CREEP_ROLE_MINER] < 2) {
-        if (this._createCreep(c.CREEP_ROLE_MINER)) {
-            return;
-        }
+        this._createCreep(c.CREEP_ROLE_MINER);
+        return;
     }
 
     if (!this.hasUpgrader) {
-        if (this._createCreep(c.CREEP_ROLE_UPGRADER)) {
-            return;
-        }
+        this._createCreep(c.CREEP_ROLE_UPGRADER);
+        return;
     }
 
 
     if (this.creepCount >= c.GLOBAL_CREEP_LIMIT || this.creepCount >= levelDefinition.creepLimit) {
+        // occupation in progress
+        if (Game.flags['REMOTE'] && Memory.developmentAidWorkerCount < 2) {
+            this._createCreep(c.CREEP_ROLE_DEVELOPMENT_AID_WORKER);
+        }
+
         return;
     }
 
     if (!this.hasBuilder) {
-        if (this._createCreep(c.CREEP_ROLE_BUILDER)) {
-            return;
-        }
+        this._createCreep(c.CREEP_ROLE_BUILDER);
+        return;
     }
 
     if (!this.hasRepairer) {
-        if (this._createCreep(c.CREEP_ROLE_REPAIRER)) {
-            return;
-        }
+        this._createCreep(c.CREEP_ROLE_REPAIRER)
+        return;
     }
 
     for (var role in levelDefinition.creepInstances) {
         if (this.creepStats[role] < levelDefinition.creepInstances[role]) {
-            if (this._createCreep(role)) {
-                return;
-            }
+            this._createCreep(role);
+            return;
         }
+    }
+
+    if (Game.flags['REMOTE'] && Memory.developmentAidWorkerCount < 2) {
+        this._createCreep(c.CREEP_ROLE_DEVELOPMENT_AID_WORKER);
     }
 };
 
@@ -184,7 +239,7 @@ CreepController.prototype._populateRoom = function() {
  * @param role
  */
 CreepController.prototype._createCreep = function(role) {
-    console.log('creepCtrl::_createCreep', role);
+    console.log('creepCtrl::_createCreep', this.playRoom.getName(), role);
     if (role == c.CREEP_ROLE_DISTRIBUTOR) {
         if (this.playRoom.extensionCollection.length == 0 || (!this.playRoom.storage && this.playRoom.containerCollection.length == 0)) {
             return;
@@ -269,6 +324,9 @@ CreepController.prototype._creationPossible = function(role) {
 CreepController.prototype._discoverCreep = function(creep) {
     this.creepCount += 1;
     this.creepStats[creep.getRole()] += 1;
+    if (creep.remember('formerRole')) {
+        this.creepStats[creep.remember('formerRole')] += 1;
+    }
 };
 
 /**

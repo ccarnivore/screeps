@@ -52,6 +52,32 @@ AbstractCreep.forget = function(key) {
 };
 
 /**
+ * morphs a creep to another role
+ *
+ * @param newRole
+ */
+AbstractCreep.morphRole = function(newRole) {
+    this.remember('formerRole', this.remember('role'));
+    this.remember('revertMorphAt', Game.time + 200);
+    this.remember('role', newRole);
+    this.forget('task');
+};
+
+/**
+ * checks if its time to revert the morph
+ */
+AbstractCreep.revertMorph = function() {
+    if (!this.remember('formerRole') || Game.time < this.remember('revertMorphAt')) {
+        return;
+    }
+
+    this.remember('role', this.remember('formerRole'));
+    this.forget('revertMorphAt');
+    this.forget('formerRole');
+    this.forget('task');
+};
+
+/**
  * indicates the unit carries energy
  *
  * @returns {boolean}
@@ -86,6 +112,7 @@ AbstractCreep._handleHarvesting = function() {
     }
 
     if (this._isFullyLoaded() || !this._harvestEnergy(this)) {
+        this.forget('cachedEnergySource');
         this._isWorking(true);
     }
 };
@@ -130,7 +157,14 @@ AbstractCreep._isWorking = function(startWorking) {
     return this.remember('task', c.CREEP_TASK_WORKING);
 };
 
+/**
+ * working routine for imp creeps
+ */
 AbstractCreep.doWork = function() {
+    if (this.hasOwnProperty('_preHarvesting')) {
+        this._preHarvesting();
+    }
+
     if (!this._isEmployed()) {
         this._isHarvesting(true);
     }

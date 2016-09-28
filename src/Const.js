@@ -6,8 +6,11 @@ module.exports = {
     CREEP_ROLE_CLAIMER: 'claimer',
     CREEP_ROLE_DISTRIBUTOR: 'distributor',
     CREEP_ROLE_BUILDER: 'builder',
+    CREEP_ROLE_DEVELOPMENT_AID_WORKER: 'developmentAidWorker',
     CREEP_ROLE_UPGRADER: 'upgrader',
     CREEP_ROLE_REPAIRER: 'repairer',
+    CREEP_ROLE_WARRIOR: 'warrior',
+    CREEP_ROLE_HEALER: 'healer',
 
     CREEP_TASK_HARVESTING: 'harvesting',
     CREEP_TASK_WORKING: 'working',
@@ -29,7 +32,7 @@ module.exports = {
                 upgrader: 2
             },
             maxRepairFactor: {
-                'constructedWall': 30000,
+                'constructedWall': 150000,
                 'rampart': 300,
                 'road': 4,
                 'container': 10
@@ -39,35 +42,37 @@ module.exports = {
             minEnergy: 400,
             creepLimit: 18,
             creepInstances: {
-                miner: 2,
+                miner: 4,
                 harvester: 4,
-                distributor: 2,
+                distributor: 1,
                 builder: 2,
                 upgrader: 4,
-                repairer: 2,
+                repairer: 1,
+                claimer: 0
             },
             maxRepairFactor: {
-                'constructedWall': 1000,
+                'constructedWall': 15000,
                 'rampart': 10,
                 'road': 2,
-                'container': 5
+                'container': 4
             }
         },
         LEVEL3: {
-            minEnergy: 700,
+            minEnergy: 1000,
             creepLimit: 30,
             creepInstances: {
                 miner: 4,
-                harvester: 8,
-                distributor: 3,
-                builder: 1,
-                upgrader: 4,
+                harvester: 4,
+                distributor: 2,
+                builder: 2,
+                upgrader: 6,
                 repairer: 2,
-                claimer: 2,
+                warrior: 0,
+                healer: 0
             },
             maxRepairFactor: {
-                'constructedWall': 500,
-                'rampart': 5,
+                'constructedWall': 1500,
+                'rampart': 20,
                 'road': 2,
                 'container': 2
             }
@@ -91,20 +96,39 @@ module.exports = {
             LEVEL3: {
                 pattern: [CARRY, CARRY, MOVE, MOVE],
                 cost: 200
-            },
+            }
+        },
+        warrior: {
+            extensionOrder: [MOVE, ATTACK, TOUGH, TOUGH],
+            LEVEL3: {
+                pattern: [
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE,
+                    ATTACK
+                ],
+                cost: 300
+            }
+        },
+        healer: {
+            extensionOrder: [MOVE, TOUGH, TOUGH, TOUGH, TOUGH, HEAL, HEAL],
+            LEVEL3: {
+                pattern: [MOVE, HEAL, HEAL],
+                cost: 550
+            }
         },
         harvester: {
             extensionOrder: [CARRY, CARRY, MOVE],
             LEVEL1: {
-                pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
+                pattern: [WORK, MOVE, CARRY, CARRY, CARRY],
                 cost: 300
             },
             LEVEL2: {
-                pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
+                pattern: [WORK, MOVE, CARRY, CARRY, CARRY],
                 cost: 300
             },
             LEVEL3: {
-                pattern: [WORK, CARRY, MOVE, CARRY, MOVE],
+                pattern: [WORK, MOVE, CARRY, CARRY, CARRY],
                 cost: 300
             },
         },
@@ -175,14 +199,29 @@ module.exports = {
                 cost: 1250
             },
             LEVEL2: {
-                pattern: [MOVE, CLAIM, CLAIM],
-                cost: 1250
+                pattern: [MOVE, CLAIM],
+                cost: 650
             },
             LEVEL3: {
-                pattern: [MOVE, CLAIM, CLAIM],
-                cost: 1250
+                pattern: [MOVE, CLAIM],
+                cost: 650
             }
         },
+        developmentAidWorker: {
+            extensionOrder: [WORK, MOVE, CARRY],
+            LEVEL1: {
+                pattern: [WORK, MOVE, CARRY],
+                cost: 200
+            },
+            LEVEL2: {
+                pattern: [WORK, MOVE, CARRY],
+                cost: 200
+            },
+            LEVEL3: {
+                pattern: [WORK, MOVE, CARRY],
+                cost: 200
+            }
+        }
     },
 
     DISTRIBUTION_ENERGY_RELEVANCE: {

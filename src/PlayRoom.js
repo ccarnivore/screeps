@@ -21,6 +21,7 @@ function PlayRoom(room) {
     this.invaderCollection = [];
 
     this.droppedEnergyCollection = [];
+    this.alternateEnergySourceCollection = [];
     this.energySourceCollection = [];
     this.containerCollection = [];
     this.constructionSiteCollection = [];
@@ -98,7 +99,10 @@ PlayRoom.prototype.getPlayRoomLevel = function() {
  */
 PlayRoom.prototype.getSpawnEnergyTotal = function() {
     if (this.spawnEnergy == 0) {
-        this.spawnEnergy += this.getSpawn().energy;
+        var spawn = this.getSpawn();
+        if (spawn) {
+            this.spawnEnergy += spawn.energy;
+        }
 
         this.extensionCollection.forEach(function(extension) {
             this.spawnEnergy += extension.energy;
@@ -140,6 +144,12 @@ PlayRoom.prototype.measure = function() {
     }.bind(this));
 
     this.droppedEnergyCollection = this.room.find(FIND_DROPPED_ENERGY);
+    this.droppedEnergyCollection.forEach(function (energy) {
+        if (energy.amount >= 1000) {
+            this.alternateEnergySourceCollection.push(energy);
+        }
+    }.bind(this));
+
     this.energySourceCollection = this.room.find(FIND_SOURCES);
     this.constructionSiteCollection = this.room.find(FIND_MY_CONSTRUCTION_SITES);
     if (this.constructionSiteCollection.length == 0) {
@@ -265,7 +275,7 @@ PlayRoom.prototype.getRepairTarget = function() {
  * @returns {*}
  */
 PlayRoom.prototype.getDestinationForHarvester = function() {
-    if (Memory.invaderSpotted) {
+    if (Memory.invaderSpotted[this.getName()]) {
         var tower = this.getTowerForRefill();
         if (tower) {
             return tower;
@@ -308,12 +318,24 @@ PlayRoom.prototype.getDroppedEnergy = function(creep) {
 
     var maxRange = 4;
     for (var droppedEnergyId in this.droppedEnergyCollection) {
-        var droppedEnergy = this.droppedEnergyCollection[droppedEnergyId];
-        if (creep.creep.pos.findPathTo(droppedEnergy).length <= maxRange) {
+        var droppedEnergy = this.droppedEnergyCollection[droppedEnergyId],
+            path = creep.creep.pos.findPathTo(droppedEnergy);
+
+        if (path.length <= maxRange && path.length > 0 && (droppedEnergy.amount > 100 || creep.remember('role') == c.CREEP_ROLE_HARVESTER)) {
             creep.remember('usedDroppedEnergyId', droppedEnergy.id);
 
             return droppedEnergy;
         }
+    }
+};
+
+PlayRoom.prototype.getAlternateEnergySource = function(creep) {
+    this.alternateEnergySourceCollection.sort(function (a, b) {
+        return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
+    });
+
+    if (this.alternateEnergySourceCollection[0]) {
+        return this.alternateEnergySourceCollection[0];
     }
 };
 
@@ -450,6 +472,11 @@ PlayRoom.prototype.getDistributionTarget = function(creep) {
         }
     }
 
+    var spawn = this.getSpawn();
+    if (spawn && spawn.energy < spawn.energyCapacity) {
+        return spawn;
+    }
+
     for (var extensionId in this.extensionCollection) {
         if (this.extensionCollection[extensionId].energy < this.extensionCollection[extensionId].energyCapacity) {
             return this.extensionCollection[extensionId];
@@ -518,10 +545,36 @@ PlayRoom.prototype.getTargetLink = function(creep) {
  * @returns {*}
  */
 PlayRoom.prototype.getEnergyStorageCollection = function(creep) {
+    if (creep.remember('cachedEnergySource')) {
+        var cachedEnergySource = Game.getObjectById(creep.remember('cachedEnergySource'));
+        if (cachedEnergySource && cachedEnergySource.store[RESOURCE_ENERGY]) {
+            return cachedEnergySource;
+        }
+
+        creep.forget('cachedEnergySource');
+    }
+
+    var targetCollection = [];
+    if (this.storage && this.storage.store[RESOURCE_ENERGY] > 0) {
+        targetCollection.push(this.storage);
+    }
+
     for (var containerId in this.containerCollection) {
         if (this.containerCollection[containerId].store[RESOURCE_ENERGY]) {
-            return this.containerCollection[containerId];
+            targetCollection.push(this.containerCollection[containerId]);
         }
+    }
+
+    if (targetCollection.length > 0) {
+        if (targetCollection.length == 1) {
+            return this._cacheEnergyStorage(creep, targetCollection[0]);
+        }
+
+        targetCollection.sort(function (a, b) {
+            return creep.creep.pos.getRangeTo(a) - creep.creep.pos.getRangeTo(b);
+        });
+
+        return this._cacheEnergyStorage(creep, targetCollection[0]);
     }
 
     for (var extensionId in this.extensionCollection) {
@@ -534,6 +587,11 @@ PlayRoom.prototype.getEnergyStorageCollection = function(creep) {
     if (spawn && spawn.energy == spawn.energyCapacity) {
         return spawn;
     }
+};
+
+PlayRoom.prototype._cacheEnergyStorage = function(creep, target) {
+    creep.remember('cachedEnergySource', target.id);
+    return target;
 };
 
 module.exports = PlayRoom;

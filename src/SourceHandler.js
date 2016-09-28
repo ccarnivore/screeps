@@ -48,14 +48,18 @@ SourceHandler.prototype._getEnergy = function(creep, type, target) {
 };
 
 SourceHandler.prototype.getEnergy = function(creep) {
-    var energySource, resource;
-    if (creep.getRole() != c.CREEP_ROLE_MINER) {
+    var energySource, resource, alternateEnergySource, res;
+    if (creep.getRole() != c.CREEP_ROLE_MINER && creep.getRole() != c.CREEP_ROLE_DEVELOPMENT_AID_WORKER) {
         if (energySource = this.room.getDroppedEnergy(creep)) {
-            return this._getEnergy(creep, RESOURCE_ENERGY, energySource);
+            if (res = this._getEnergy(creep, RESOURCE_ENERGY, energySource) != ERR_INVALID_TARGET) {
+                return res;
+            }
         }
     }
 
-    if (creep.getRole() == c.CREEP_ROLE_MINER || creep.getRole() == c.CREEP_ROLE_HARVESTER) {
+    if (creep.getRole() == c.CREEP_ROLE_MINER
+        || creep.getRole() == c.CREEP_ROLE_HARVESTER
+        || creep.getRole() == c.CREEP_ROLE_DEVELOPMENT_AID_WORKER) {
         resource = this.room.getEnergySource(creep);
         return this._getEnergy(creep, LOOK_SOURCES, resource);
     }
@@ -78,6 +82,12 @@ SourceHandler.prototype.getEnergy = function(creep) {
     }
 
     energySource = this.room.getEnergyStorageCollection(creep);
+    if (!energySource && creep.getRole() == c.CREEP_ROLE_UPGRADER) {
+        if (alternateEnergySource = this.room.getAlternateEnergySource(creep)) {
+            return this._getEnergy(creep, RESOURCE_ENERGY, alternateEnergySource);
+        }
+    }
+
     return this._getEnergy(creep, STRUCTURE_CONTAINER, energySource);
 };
 
