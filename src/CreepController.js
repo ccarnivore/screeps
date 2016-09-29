@@ -254,42 +254,12 @@ CreepController.prototype._createCreep = function(role) {
 
     if (this._creationPossible(role)) {
         var creationEnergy = this.playRoom.getSpawnEnergyTotal(),
-            generalConstructionPlan = c.GLOBAL_BUILD_PATTERN[role],
             levelConstructionPlan = c.GLOBAL_BUILD_PATTERN[role][this.playRoom.getPlayRoomLevel()],
-            buildPattern = levelConstructionPlan.pattern.slice(0),
-            extensionOrder = generalConstructionPlan.extensionOrder.slice(0),
-            diff = creationEnergy - levelConstructionPlan.cost;
+            buildPattern = levelConstructionPlan.pattern.slice(0);
 
         console.log('creepController::_createCreep::creation energy', creationEnergy);
-        console.log('creepController::_createCreep::build pattern default', JSON.stringify(buildPattern));
-
-        if (diff >= c.MIN_ENERGY_CHUNK) {
-            var i = 0, x = 0, part, cost;
-            while (diff >= c.MIN_ENERGY_CHUNK) {
-                if (x > 12) {
-                    break;
-                }
-
-                if (i == extensionOrder.length) {
-                    i = 0;
-                }
-
-                part = extensionOrder[i];
-                cost = BODYPART_COST[part];
-
-                if (diff - cost >= 0) {
-                    x++;
-                    buildPattern.push(part);
-                    diff -= cost;
-                } else {
-                    break;
-                }
-
-                i++;
-            }
-        }
-
         console.log('creepController::_createCreep::build pattern used', JSON.stringify(buildPattern));
+
         var spawn = this.playRoom.getSpawn();
         var spawnResult = spawn.createCreep(buildPattern, null, {role: role, birthRoom: spawn.room.name});
         console.log('creepController::_createCreep::spawn result', spawnResult);

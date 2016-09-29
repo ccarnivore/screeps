@@ -83,53 +83,46 @@ module.exports = {
     MIN_CREEP_ENERGY_LEVEL: 200,
 
     GLOBAL_BUILD_PATTERN: {
+        miner: {
+            LEVEL1: {
+                pattern: [WORK, WORK, MOVE],
+                cost: 250
+            },
+            LEVEL2: {
+                pattern: [WORK, WORK, WORK, MOVE, MOVE],
+                cost: 450
+            },
+            LEVEL3: {
+                pattern: [WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE],
+                cost: 700
+            }
+        },
         distributor: {
-            extensionOrder: [CARRY, CARRY, CARRY, MOVE],
             LEVEL1: {
                 pattern: [CARRY, CARRY, MOVE, MOVE],
                 cost: 200
             },
             LEVEL2: {
-                pattern: [CARRY, CARRY, MOVE, MOVE],
-                cost: 200
+                pattern: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+                cost: 400
             },
             LEVEL3: {
-                pattern: [CARRY, CARRY, MOVE, MOVE],
-                cost: 200
-            }
-        },
-        warrior: {
-            extensionOrder: [MOVE, ATTACK, TOUGH, TOUGH],
-            LEVEL3: {
-                pattern: [
-                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE,
-                    ATTACK
-                ],
-                cost: 300
-            }
-        },
-        healer: {
-            extensionOrder: [MOVE, TOUGH, TOUGH, TOUGH, TOUGH, HEAL, HEAL],
-            LEVEL3: {
-                pattern: [MOVE, HEAL, HEAL],
-                cost: 550
+                pattern: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+                cost: 600
             }
         },
         harvester: {
-            extensionOrder: [CARRY, CARRY, MOVE],
             LEVEL1: {
-                pattern: [WORK, MOVE, CARRY, CARRY, CARRY],
+                pattern: [WORK, CARRY, CARRY, MOVE, MOVE],
                 cost: 300
             },
             LEVEL2: {
-                pattern: [WORK, MOVE, CARRY, CARRY, CARRY],
-                cost: 300
+                pattern: [WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+                cost: 500
             },
             LEVEL3: {
-                pattern: [WORK, MOVE, CARRY, CARRY, CARRY],
-                cost: 300
+                pattern: [WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+                cost: 700
             },
         },
         upgrader: {
@@ -139,59 +132,43 @@ module.exports = {
                 cost: 200
             },
             LEVEL2: {
-                pattern: [WORK, CARRY, MOVE],
-                cost: 200
+                pattern: [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 400
             },
             LEVEL3: {
-                pattern: [WORK, CARRY, MOVE],
-                cost: 200
+                pattern: [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE],
+                cost: 550
             }
         },
         builder: {
-            extensionOrder: [WORK, CARRY, WORK, CARRY, MOVE],
             LEVEL1: {
                 pattern: [WORK, CARRY, MOVE],
                 cost: 200
             },
             LEVEL2: {
-                pattern: [WORK, CARRY, MOVE],
-                cost: 200
+                pattern: [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 400
             },
             LEVEL3: {
-                pattern: [WORK, CARRY, MOVE],
-                cost: 200
+                pattern: [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE],
+                cost: 550
             }
         },
         repairer: {
-            extensionOrder: [CARRY, CARRY, MOVE, MOVE, WORK, WORK],
             LEVEL1: {
-                pattern: [WORK, WORK, CARRY, MOVE],
-                cost: 300
+                pattern: [WORK, CARRY, MOVE],
+                cost: 200
             },
             LEVEL2: {
-                pattern: [WORK, WORK, CARRY, MOVE],
-                cost: 300
+                pattern: [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 400
             },
             LEVEL3: {
-                pattern: [WORK, WORK, CARRY, MOVE],
-                cost: 300
+                pattern: [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE],
+                cost: 550
             }
         },
-        miner: {
-            extensionOrder: [WORK, WORK, WORK, WORK],
-            LEVEL1: {
-                pattern: [WORK, WORK, MOVE],
-                cost: 250
-            },
-            LEVEL2: {
-                pattern: [WORK, WORK, MOVE],
-                cost: 250
-            },
-            LEVEL3: {
-                pattern: [WORK, WORK, MOVE],
-                cost: 250
-            }
-        },
+
         claimer: {
             extensionOrder: [MOVE, CLAIM, CLAIM],
             LEVEL1: {
@@ -221,7 +198,26 @@ module.exports = {
                 pattern: [WORK, MOVE, CARRY],
                 cost: 200
             }
-        }
+        },
+        warrior: {
+            extensionOrder: [MOVE, ATTACK, TOUGH, TOUGH],
+            LEVEL3: {
+                pattern: [
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE,
+                    ATTACK
+                ],
+                cost: 300
+            }
+        },
+        healer: {
+            extensionOrder: [MOVE, TOUGH, TOUGH, TOUGH, TOUGH, HEAL, HEAL],
+            LEVEL3: {
+                pattern: [MOVE, HEAL, HEAL],
+                cost: 550
+            }
+        },
     },
 
     DISTRIBUTION_ENERGY_RELEVANCE: {
