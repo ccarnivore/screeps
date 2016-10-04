@@ -71,10 +71,6 @@ PlayRoom.prototype.isMyRoom = function() {
 PlayRoom.prototype.checkPlayRoomLevel = function() {
     var energy = this.getSpawnEnergyTotal();
     for (var level in c.LEVEL_DEFINITION) {
-        if (level <= Memory.currentLevel[this.getName()]) {
-            continue;
-        }
-
         if (energy >= c.LEVEL_DEFINITION[level].minEnergy) {
             console.log('upgrading level to ' + level);
             Memory.currentLevel[this.getName()] = level;

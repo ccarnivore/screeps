@@ -44,9 +44,9 @@ module.exports = {
             creepInstances: {
                 miner: 4,
                 harvester: 4,
-                distributor: 1,
+                distributor: 2,
                 builder: 2,
-                upgrader: 4,
+                upgrader: 2,
                 repairer: 1,
                 claimer: 0
             },
@@ -65,7 +65,7 @@ module.exports = {
                 harvester: 4,
                 distributor: 2,
                 builder: 2,
-                upgrader: 6,
+                upgrader: 2,
                 repairer: 2,
                 warrior: 0,
                 healer: 0
@@ -176,27 +176,26 @@ module.exports = {
                 cost: 1250
             },
             LEVEL2: {
-                pattern: [MOVE, CLAIM],
-                cost: 650
+                pattern: [MOVE, CLAIM, CLAIM],
+                cost: 1250
             },
             LEVEL3: {
-                pattern: [MOVE, CLAIM],
-                cost: 650
+                pattern: [MOVE, CLAIM, CLAIM],
+                cost: 1250
             }
         },
         developmentAidWorker: {
-            extensionOrder: [WORK, MOVE, CARRY],
             LEVEL1: {
-                pattern: [WORK, MOVE, CARRY],
+                pattern: [WORK, CARRY, MOVE],
                 cost: 200
             },
             LEVEL2: {
-                pattern: [WORK, MOVE, CARRY],
-                cost: 200
+                pattern: [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+                cost: 400
             },
             LEVEL3: {
-                pattern: [WORK, MOVE, CARRY],
-                cost: 200
+                pattern: [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE],
+                cost: 550
             }
         },
         warrior: {

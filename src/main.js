@@ -11,12 +11,16 @@ Memory.currentLevel = Memory.currentLevel || {};
 Memory.linkHandling = Memory.linkHandling || {};
 Memory.invaderSpotted = Memory.invaderSpotted || {};
 Memory.developmentAidWorkerCount = 0;
+Memory.claimerCount = 0;
 Memory.linkHandling.sourceLinkCollection = Memory.linkHandling.sourceLinkCollection || {};
 Memory.linkHandling.targetLinkCollection = Memory.linkHandling.targetLinkCollection || {};
 
 for (var creepName in Game.creeps) {
     if (Game.creeps[creepName].memory.role == c.CREEP_ROLE_DEVELOPMENT_AID_WORKER) {
         Memory.developmentAidWorkerCount = Memory.developmentAidWorkerCount + 1;
+    }
+    if (Game.creeps[creepName].memory.role == c.CREEP_ROLE_CLAIMER) {
+        Memory.claimerCount = Memory.claimerCount + 1;
     }
 }
 

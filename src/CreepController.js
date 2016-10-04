@@ -204,8 +204,14 @@ CreepController.prototype._populateRoom = function() {
 
     if (this.creepCount >= c.GLOBAL_CREEP_LIMIT || this.creepCount >= levelDefinition.creepLimit) {
         // occupation in progress
-        if (Game.flags['REMOTE'] && Memory.developmentAidWorkerCount < 2) {
-            this._createCreep(c.CREEP_ROLE_DEVELOPMENT_AID_WORKER);
+        if (Game.flags['REMOTE']) {
+            if (Memory.claimerCount < 1) {
+                this._createCreep(c.CREEP_ROLE_CLAIMER);
+            }
+
+            if (Memory.developmentAidWorkerCount < 2 && Memory.newRoomAvailable) {
+                this._createCreep(c.CREEP_ROLE_DEVELOPMENT_AID_WORKER);
+            }
         }
 
         return;
@@ -228,8 +234,14 @@ CreepController.prototype._populateRoom = function() {
         }
     }
 
-    if (Game.flags['REMOTE'] && Memory.developmentAidWorkerCount < 2) {
-        this._createCreep(c.CREEP_ROLE_DEVELOPMENT_AID_WORKER);
+    if (Game.flags['REMOTE']) {
+        if (Memory.claimerCount < 1) {
+            this._createCreep(c.CREEP_ROLE_CLAIMER);
+        }
+
+        if (Memory.developmentAidWorkerCount < 2 && Memory.newRoomAvailable) {
+            this._createCreep(c.CREEP_ROLE_DEVELOPMENT_AID_WORKER);
+        }
     }
 };
 
