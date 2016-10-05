@@ -11,53 +11,30 @@ function UpgraderCreep(creep) {
 /**
  * units main routing
  */
-UpgraderCreep.prototype.doWork = function() {
-    var room = this.worldController.getRoom(this.remember('birthRoom'));
-
-    if (!this.remember('task')) {
-        this._isHarvesting(true);
-    }
-
-    if (this._isUpgrading()) {
-        if (!this._hasEnergy()) {
-            this._isHarvesting(true);
-        }
-
-        var controller = room.getRoomController();
-        if (controller) {
-            switch(this.creep.upgradeController(controller)) {
-                case ERR_NOT_IN_RANGE: {
-                    this._walk(controller);
-                    break;
-                }
-                case ERR_NOT_ENOUGH_RESOURCES: {
-                    this._isHarvesting(true);
-                    break;
-                }
-                case ERR_FULL: {
-                    return;
-                }
+UpgraderCreep.prototype._doWork = function() {
+    var controller = this.getRoom().getRoomController();
+    if (controller) {
+        switch(this.creep.upgradeController(controller)) {
+            case ERR_NOT_IN_RANGE: {
+                this.walk(controller);
+                break;
             }
-        } else {
-            if (this._isFullyLoaded()) {
-                console.log(this.creep, this.remember('role'), 'resting');
+            case ERR_NOT_ENOUGH_RESOURCES: {
+                this._isHarvesting(true);
+                break;
+            }
+            case ERR_FULL: {
                 return;
             }
-
-            this._isHarvesting(true);
         }
-    }
-
-    if (this._isHarvesting()) {
-        if (!this._harvestEnergy(this)) {
-            this._isUpgrading(true);
-        }
-
+    } else {
         if (this._isFullyLoaded()) {
-            this._isUpgrading(true);
+            console.log(this.creep, this.remember('role'), 'resting');
+            return;
         }
-    }
 
+        this._isHarvesting(true);
+    }
 };
 
 module.exports = UpgraderCreep;

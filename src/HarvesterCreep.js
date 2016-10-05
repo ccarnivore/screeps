@@ -11,50 +11,30 @@ function HarvesterCreep(creep) {
 /**
  * units main routing
  */
-HarvesterCreep.prototype.doWork = function() {
-    var birthRoom = this.worldController.getRoom(this.remember('birthRoom'));
-
-    if (!this.remember('task')) {
-        this._isHarvesting(true);
-    }
-
-    if (this._isTransferring()) {
-        if (!this._hasEnergy()) {
-            this._isHarvesting(true);
-        }
-
-        var target = birthRoom.getDestinationForHarvester(this);
-        if (target) {
-            switch(this.creep.transfer(target, RESOURCE_ENERGY)) {
-                case ERR_NOT_IN_RANGE: {
-                    this._walk(target);
-                    break;
-                }
-                case ERR_NOT_ENOUGH_RESOURCES: {
-                    this._isHarvesting(true);
-                    break;
-                }
+HarvesterCreep.prototype._doWork = function() {
+    var target = this.getRoom().getDestinationForHarvester();
+    if (target) {
+        switch(this.creep.transfer(target, RESOURCE_ENERGY)) {
+            case ERR_NOT_IN_RANGE: {
+                this.walk(target);
+                break;
             }
-        } else {
-            if (this._isFullyLoaded()) {
-                console.log(this.creep, this.remember('role'), 'resting');
-                return;
+            case ERR_NOT_ENOUGH_RESOURCES: {
+                this._isHarvesting(true);
+                break;
             }
-
-            this._isHarvesting(true);
         }
-    }
-
-    if (this._isHarvesting()) {
-        if (!this._harvestEnergy(this)) {
-            this._isTransferring(true);
-        }
-
+    } else {
         if (this._isFullyLoaded()) {
-            this._isTransferring(true);
+            if (this.getRoom().getName() != this.remember('birthRoom')) {
+                var exitDir = this.getRoom().room.findExitTo(this.remember('birthRoom'));
+                var exit = this.creep.pos.findClosestByRange(exitDir);
+                this.walk(exit);
+            }
+
+            return;
         }
     }
-
 };
 
 module.exports = HarvesterCreep;

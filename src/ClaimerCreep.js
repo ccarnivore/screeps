@@ -11,22 +11,25 @@ function ClaimerCreep(creep) {
 /**
  * units main routing
  */
-ClaimerCreep.prototype.doWork = function() {
+ClaimerCreep.prototype._doWork = function() {
     var remoteFlag = Game.flags['REMOTE'];
-    if (!remoteFlag) {
-        return;
-    }
-
     if (this.creep.pos.roomName != remoteFlag.pos.roomName) {
-        this._walk(remoteFlag);
+        this.walk(remoteFlag);
         return;
     }
-
 
     // claim controller
-    var controller = this.creep.room.controller;
-    if (this.creep.reserveController(controller) == ERR_NOT_IN_RANGE) {
-        this._walk(controller);
+    var controller = this.creep.room.controller,
+        res;
+
+    if (Memory.roomCount < Game.gcl.level) {
+        res = this.creep.claimController(controller);
+    } else {
+        res = this.creep.reserveController(controller);
+    }
+
+    if (res == ERR_NOT_IN_RANGE) {
+        this.walk(controller);
     }
 };
 

@@ -1,22 +1,18 @@
-function LinkController(worldCtrl) {
-    this.worldController = worldCtrl;
+/**
+ *
+ * @param playRoom
+ * @constructor
+ */
+function LinkController(playRoom) {
+    this.playRoom = playRoom;
 }
 
+/**
+ * main link controller routine
+ */
 LinkController.prototype.run = function() {
-    for (var roomName in this.worldController.roomCollection) {
-        var room = this.worldController.roomCollection[roomName];
-        if (!this.worldController.linkCollection[roomName] || this.worldController.linkCollection[roomName].length == 0) {
-            continue;
-        }
-
-        this._transferEnergy(room);
-    }
-};
-
-LinkController.prototype._transferEnergy = function(room) {
-    var linkCollection = this.worldController.linkCollection[room.getName()] || [];
-    linkCollection.forEach(function(link) {
-        if (link.cooldown > 0 && link.energy <= 0) {
+    this.playRoom.linkCollection.forEach(function(link) {
+        if (link.cooldown > 0 || link.energy <= 0) {
             return;
         }
 
@@ -26,7 +22,9 @@ LinkController.prototype._transferEnergy = function(room) {
 
         for (var targetLinkId in Memory.linkHandling.targetLinkCollection) {
             var targetLink = Game.getObjectById(targetLinkId)
-            if (!targetLink || Memory.linkHandling.targetLinkCollection[targetLinkId] != link.id) {
+            if (!targetLink
+                || Memory.linkHandling.targetLinkCollection[targetLinkId] != link.id
+                || (targetLink.energy > (targetLink.energyCapacity / 2))) {
                 continue;
             }
 
@@ -34,6 +32,5 @@ LinkController.prototype._transferEnergy = function(room) {
         }
     });
 };
-
 
 module.exports = LinkController;
