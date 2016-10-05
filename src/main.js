@@ -29,7 +29,6 @@ var myRoomCollection = [],
 
 for (var roomName in Game.rooms) {
     var playRoom = new PlayRoom(Game.rooms[roomName]);
-    console.log('main::measuring room', playRoom.getName());
     playRoom.measure();
 
     if (playRoom.isMyRoom()) {

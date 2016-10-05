@@ -41,8 +41,23 @@ PlayRoom.prototype.getName = function() {
     return this.room.name;
 };
 
-PlayRoom.prototype.getStats = function() {
-    return this.energySourceCollection;
+/**
+ * sum of stored energy
+ *
+ * @returns {number}
+ */
+PlayRoom.prototype.getStoredEnergy = function() {
+    var storedEnergy = 0;
+    this.containerCollection.forEach(function (container) {
+        storedEnergy += container.store[RESOURCE_ENERGY];
+    });
+
+    if (this.storage) {
+        storedEnergy += this.storage.store[RESOURCE_ENERGY];
+    }
+
+    console.log('playRoom::getStoredEnergy / RoomLevel::', this.room, storedEnergy, Memory.currentLevel[this.getName()]);
+    return storedEnergy;
 };
 
 /**
@@ -72,7 +87,6 @@ PlayRoom.prototype.checkPlayRoomLevel = function() {
     var energy = this.getSpawnEnergyTotal();
     for (var level in c.LEVEL_DEFINITION) {
         if (energy >= c.LEVEL_DEFINITION[level].minEnergy) {
-            console.log('upgrading level to ' + level);
             Memory.currentLevel[this.getName()] = level;
         }
     }
@@ -473,10 +487,18 @@ PlayRoom.prototype.getDistributionTarget = function(creep) {
         return spawn;
     }
 
+    var usedExtension, pathLength;
     for (var extensionId in this.extensionCollection) {
         if (this.extensionCollection[extensionId].energy < this.extensionCollection[extensionId].energyCapacity) {
-            return this.extensionCollection[extensionId];
+            var t = creep.creep.pos.getRangeTo(this.extensionCollection[extensionId]);
+            if (!pathLength || t < pathLength) {
+                pathLength = t;
+                usedExtension = this.extensionCollection[extensionId];
+            }
         }
+    }
+    if (usedExtension) {
+        return usedExtension;
     }
 
     var tower = this.getTowerForRefill(2);

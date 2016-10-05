@@ -201,7 +201,6 @@ CreepController.prototype._populateRoom = function() {
         return;
     }
 
-
     if (this.creepCount >= c.GLOBAL_CREEP_LIMIT || this.creepCount >= levelDefinition.creepLimit) {
         // occupation in progress
         if (Game.flags['REMOTE']) {
@@ -225,6 +224,11 @@ CreepController.prototype._populateRoom = function() {
     if (!this.hasRepairer) {
         this._createCreep(c.CREEP_ROLE_REPAIRER)
         return;
+    }
+
+    var additionalUpgrader = Math.max(Math.ceil(this.playRoom.getStoredEnergy()/10000) - 2, 0);
+    if (additionalUpgrader > 0) {
+        levelDefinition.creepInstances[c.CREEP_ROLE_UPGRADER] += additionalUpgrader;
     }
 
     for (var role in levelDefinition.creepInstances) {
