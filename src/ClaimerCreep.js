@@ -13,6 +13,10 @@ function ClaimerCreep(creep) {
  */
 ClaimerCreep.prototype._doWork = function() {
     var remoteFlag = Game.flags['REMOTE'];
+    if (!remoteFlag) {
+        return;
+    }
+
     if (this.creep.pos.roomName != remoteFlag.pos.roomName) {
         this.walk(remoteFlag);
         return;

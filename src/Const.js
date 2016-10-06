@@ -97,6 +97,26 @@ module.exports = {
                 'road': 2,
                 'container': 2
             }
+        },
+        LEVEL5: {
+            minEnergy: 2100,
+            creepLimit: 30,
+            creepInstances: {
+                miner: 2,
+                harvester: 4,
+                distributor: 2,
+                builder: 2,
+                upgrader: 2,
+                repairer: 2,
+                warrior: 0,
+                healer: 0
+            },
+            maxRepairFactor: {
+                'constructedWall': 1000,
+                'rampart': 10,
+                'road': 2,
+                'container': 2
+            }
         }
     },
 
@@ -110,8 +130,8 @@ module.exports = {
                 cost: 250
             },
             LEVEL2: {
-                pattern: [WORK, WORK, WORK, MOVE, MOVE],
-                cost: 450
+                pattern: [WORK, WORK, WORK, MOVE],
+                cost: 400
             },
             LEVEL3: {
                 pattern: [WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE],
@@ -120,6 +140,10 @@ module.exports = {
             LEVEL4: {
                 pattern: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE],
                 cost: 900
+            },
+            LEVEL5: {
+                pattern: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE],
+                cost: 1300
             }
         },
         distributor: {
@@ -138,6 +162,10 @@ module.exports = {
             LEVEL4: {
                 pattern: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
                 cost: 800
+            },
+            LEVEL5: {
+                pattern: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+                cost: 1400
             }
         },
         harvester: {
@@ -146,8 +174,8 @@ module.exports = {
                 cost: 300
             },
             LEVEL2: {
-                pattern: [WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
-                cost: 500
+                pattern: [WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
+                cost: 400
             },
             LEVEL3: {
                 pattern: [WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
@@ -157,6 +185,10 @@ module.exports = {
                 pattern: [WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
                 cost: 900
             },
+            LEVEL5: {
+                pattern: [WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+                cost: 1500
+            }
         },
         upgrader: {
             extensionOrder: [WORK, CARRY, WORK, CARRY, MOVE],
@@ -175,6 +207,10 @@ module.exports = {
             LEVEL4: {
                 pattern: [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
                 cost: 1200
+            },
+            LEVEL5: {
+                pattern: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
+                cost: 2000
             }
         },
         builder: {
@@ -193,6 +229,10 @@ module.exports = {
             LEVEL4: {
                 pattern: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
                 cost: 650
+            },
+            LEVEL5: {
+                pattern: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
+                cost: 650
             }
         },
         repairer: {
@@ -209,6 +249,10 @@ module.exports = {
                 cost: 550
             },
             LEVEL4: {
+                pattern: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
+                cost: 750
+            },
+            LEVEL5: {
                 pattern: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
                 cost: 750
             }
@@ -231,6 +275,10 @@ module.exports = {
             LEVEL4: {
                 pattern: [MOVE, CLAIM, CLAIM],
                 cost: 1250
+            },
+            LEVEL5: {
+                pattern: [MOVE, CLAIM, CLAIM],
+                cost: 1250
             }
         },
         developmentAidWorker: {
@@ -247,6 +295,10 @@ module.exports = {
                 cost: 550
             },
             LEVEL4: {
+                pattern: [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE],
+                cost: 550
+            },
+            LEVEL5: {
                 pattern: [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE],
                 cost: 550
             }
